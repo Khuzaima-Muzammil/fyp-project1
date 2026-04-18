@@ -1,0 +1,15 @@
+{
+  "short_name": "SmartShop",
+  "name": "SmartShop E-commerce App",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#111111",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "vite.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}

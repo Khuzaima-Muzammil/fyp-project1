@@ -1,20 +1,41 @@
-import React from 'react';
+// Importing React and necessary hooks
+import React, { useState, useEffect, useContext } from 'react';
+import { ShopContext } from '../context/ShopContext';
 
 const Contact = () => {
+  const { settings } = useContext(ShopContext);
+  // --- RESPONSIVE LOGIC (Mobile & Tablet check) ---
+  const [width, setWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  const isMobile = width < 768;
+  const isTablet = width >= 768 && width < 1024;
+
   return (
-    <div style={styles.container}>
-      <h1 style={styles.heading}>Contact Us</h1>
-      <p style={styles.text}>Agar aapko kisi kism ki madad chahiye, toh humse raabta karein:</p>
+    <div style={{
+      ...styles.container,
+      margin: isMobile ? '20px auto' : isTablet ? '30px auto' : '40px auto',
+      padding: isMobile ? '20px' : isTablet ? '25px' : '30px',
+      width: isMobile ? '90%' : isTablet ? '85%' : '800px'
+    }}>
+      {/* Page heading */}
+      <h1 style={{...styles.heading, fontSize: isMobile ? '24px' : isTablet ? '26px' : '28px'}}>Contact Us</h1>
+      <p style={styles.text}>If you need any help, please contact us through the following channels:</p>
+      
+      {/* Information box with details */}
       <div style={styles.infoBox}>
-        <p><strong>Email:</strong> support@smartshop.com</p>
-        <p><strong>Phone:</strong> +92 300 1234567</p>
-        <p><strong>Address:</strong> 123 Main Street, Lahore, Pakistan</p>
+        <p><strong>Email:</strong> {settings?.businessInfo?.email || 'support@fashionstore.com'}</p>
+        <p><strong>Phone:</strong> {settings?.businessInfo?.phone || '+92-300-1234567'}</p>
+        <p><strong>Address:</strong> {settings?.businessInfo?.address || 'Fashion Store, Gulberg III, Lahore, Pakistan'}</p>
       </div>
     </div>
   );
 };
 
-// --- Ye wala hissa miss ho gaya tha ---
+// --- This part was added for styling ---
 const styles = {
   container: {
     maxWidth: '800px',

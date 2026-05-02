@@ -20,7 +20,7 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  return children;
+  return children; //jo bhi user data hai tu phir return krdo
 };
 
 export default ProtectedRoute;

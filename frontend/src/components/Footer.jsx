@@ -1,53 +1,112 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+// Importing React and Link for navigation
+import React, { useState, useEffect, useContext } from 'react';
+import { Link } from 'react-router-dom';
+import { Facebook, Twitter, Instagram, Mail, Phone, MapPin, Send } from 'lucide-react';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import { ShopContext } from '../context/ShopContext';
 
 const Footer = () => {
-  const [isPWA, setIsPWA] = useState(false);
-  const location = useLocation();
+  const { settings } = useContext(ShopContext);
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // --- RESPONSIVE LOGIC ---
+  const [width, setWidth] = useState(window.innerWidth);
   useEffect(() => {
-    // Ye function check karega ke app PWA (Standalone) mode mein hai ya aam browser mein
-    const checkIsPWA = () => {
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches; // yani alag window me khol kr match krna
-      const isIOSStandalone = window.navigator.standalone === true; // iPhones ke liye
-      return isStandalone || isIOSStandalone;
-    };
-
-    // Jaise hi component load ho, check karo
-    setIsPWA(checkIsPWA());
-
-    // Agar user browser mein hi app install kar le, toh foran state update kar do
-    const handleAppInstalled = () => {
-      setIsPWA(true);
-    };
-    window.addEventListener('appinstalled', handleAppInstalled);
-
-    return () => {
-      window.removeEventListener('appinstalled', handleAppInstalled); //page change krnai pr event listener na chalta rhai is liye isai remove krdo
-    };
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // HIDE LOGIC: Agar PWA mein open hai, YA current page install-app hai, toh hide kar do
-  const hideInstallLink = isPWA || location.pathname === '/install-app';
+  const isMobile = width < 768;
+  const isTablet = width >= 768 && width < 1024;
 
   return (
-    <footer style={styles.footerContainer}>
-      <div style={styles.linksContainer}>
-        <Link to="/" style={styles.link}>Home</Link>
-        <Link to="/all-products" style={styles.link}>Products</Link>
-        <Link to="/contact" style={styles.link}>Contact</Link>
-        <Link to="/privacy" style={styles.link}>Privacy</Link>
+    <footer style={{...styles.footerContainer, padding: isMobile ? '40px 15px 20px 15px' : '60px 20px 20px 20px'}}>
+      <div style={{ 
+        ...styles.container, 
+        flexDirection: isMobile ? 'column' : 'row', 
+        flexWrap: isTablet ? 'wrap' : 'nowrap',
+        gap: isMobile ? '30px' : isTablet ? '40px' : '60px' 
+      }}>
         
-        {/* MAGIC CONDITION: Sirf tab dikhega jab dono hide conditions false hongi */}
-        {!hideInstallLink && ( // if else a skta tha lekin ye short hai aur bracket is liye kyunkai jsx yani html me javascript direct likh nhi sktai
-          <Link to="/install-app" style={styles.link}>Install App</Link>
-        )}
-        
-        <Link to="/shipping" style={styles.link}>Shipping</Link>
+        {/* 1. About Section */}
+        <div style={{ flex: isMobile ? '1' : isTablet ? '1 1 40%' : '1.5' }}>
+          <h2 style={styles.logoText}>LUMIERE</h2>
+          <p style={styles.descText}>
+            We provide high-quality premium products at affordable prices. Our mission is to make your lifestyle better with our unique collection.
+          </p>
+          <div style={styles.socialIcons}>
+            <a href={settings?.businessInfo?.socialMedia?.facebook || "https://facebook.com"} target="_blank" rel="noopener noreferrer" style={styles.iconCircle}><Facebook size={18} /></a>
+            <a href={settings?.businessInfo?.socialMedia?.twitter || "https://twitter.com"} target="_blank" rel="noopener noreferrer" style={styles.iconCircle}><Twitter size={18} /></a>
+            <a href={settings?.businessInfo?.socialMedia?.instagram || "https://instagram.com"} target="_blank" rel="noopener noreferrer" style={styles.iconCircle}><Instagram size={18} /></a>
+          </div>
+        </div>
+
+        {/* 2. Quick Links */}
+        <div style={{ flex: isMobile ? '1' : isTablet ? '1 1 20%' : '1' }}>
+          <h4 style={styles.headingStyle}>QUICK LINKS</h4>
+          <ul style={styles.listStyle}>
+            <li><Link to="/" style={styles.linkStyle}>Home</Link></li>
+            <li><Link to="/all-products" style={styles.linkStyle}>Shop</Link></li>
+            <li><Link to="/cart" style={styles.linkStyle}>Cart</Link></li>
+            <li><Link to="/privacy" style={styles.linkStyle}>Privacy</Link></li>
+            <li><Link to="/shipping" style={styles.linkStyle}>Shipping</Link></li>
+          </ul>
+        </div>
+
+        {/* 3. Contact Info */}
+        <div style={{ flex: isMobile ? '1' : isTablet ? '1 1 30%' : '1' }}>
+          <h4 style={styles.headingStyle}>CONTACT US</h4>
+          <ul style={styles.listStyle}>
+            <li style={styles.contactItem}><MapPin size={16} color="#aaa" /> {settings?.businessInfo?.address || 'Lahore, Pakistan'}</li>
+            <li style={styles.contactItem}><Phone size={16} color="#aaa" /> {settings?.businessInfo?.phone || '+92 300 1234567'}</li>
+            <li style={styles.contactItem}><Mail size={16} color="#aaa" /> {settings?.businessInfo?.email || 'info@lumiere.com'}</li>
+          </ul>
+        </div>
+
+        {/* 4. Newsletter */}
+        <div style={{ flex: isMobile ? '1' : isTablet ? '1 1 100%' : '1.5', marginTop: isTablet ? '20px' : '0' }}>
+          <h4 style={styles.headingStyle}>NEWSLETTER</h4>
+          <p style={{ color: '#aaa', fontSize: '14px', marginBottom: '15px' }}>Subscribe to get latest updates and offers.</p>
+          <form 
+            style={styles.inputGroup} 
+            onSubmit={async (e) => {
+              e.preventDefault();
+              if (email && !isSubmitting) {
+                setIsSubmitting(true);
+                try {
+                  await axios.post('http://localhost:5004/api/newsletter/subscribe', { email });
+                  toast.success("Subscribed to newsletter successfully!");
+                  setEmail("");
+                } catch (err) {
+                  toast.error(err.response?.data?.message || "Subscription failed");
+                } finally {
+                  setIsSubmitting(false);
+                }
+              }
+            }}
+          >
+            <input 
+              type="email" 
+              placeholder="Your email address" 
+              style={styles.inputStyle}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={isSubmitting}
+            />
+            <button type="submit" style={styles.sendBtn} disabled={isSubmitting}>
+              <Send size={16} />
+            </button>
+          </form>
+        </div>
+
       </div>
 
-      <div style={styles.copyright}>
-        © 2026 Shop. All rights reserved.
+      <div style={styles.bottomBar}>
+        <p>© 2024 LUMIERE. All rights reserved.</p>
       </div>
     </footer>
   );
@@ -58,32 +117,98 @@ const styles = {
   footerContainer: {
     backgroundColor: '#111',
     color: '#fff',
-    padding: '40px 20px 20px 20px',
-    textAlign: 'center',
+    padding: '60px 20px 20px 20px',
     width: '100%',
     boxSizing: 'border-box',
     marginTop: 'auto', 
   },
-  linksContainer: {
+  container: {
     display: 'flex',
-    flexWrap: 'wrap',
+    maxWidth: '1200px',
+    margin: '0 auto',
+    justifyContent: 'space-between',
+  },
+  logoText: {
+    fontSize: '24px',
+    fontWeight: 'bold',
+    marginBottom: '20px',
+    letterSpacing: '2px', 
+  },
+  descText: {
+    color: '#aaa',
+    fontSize: '14px',
+    lineHeight: '1.6',
+    marginBottom: '20px',
+  },
+  socialIcons: {
+    display: 'flex',
+    gap: '15px',
+  },
+  iconCircle: {
+    width: '36px',
+    height: '36px',
+    borderRadius: '50%',
+    backgroundColor: '#222',
+    display: 'flex',
     justifyContent: 'center',
-    gap: '24px',
-    marginBottom: '24px',
-  },
-  link: {
-    color: '#e5e7eb',
+    alignItems: 'center',
+    color: '#fff',
     textDecoration: 'none',
-    fontSize: '15px',
-    fontWeight: '500',
-    cursor: 'pointer',
   },
-  copyright: {
-    fontSize: '13px',
-    color: '#9ca3af',
+  headingStyle: {
+    fontSize: '16px',
+    fontWeight: '600',
+    marginBottom: '25px',
+    color: '#fff',
+  },
+  listStyle: {
+    listStyle: 'none',
+    padding: 0,
+    margin: 0,
+  },
+  linkStyle: {
+    color: '#aaa',
+    textDecoration: 'none',
+    fontSize: '14px',
+    display: 'block',
+    marginBottom: '12px',
+  },
+  contactItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    color: '#aaa',
+    fontSize: '14px',
+    marginBottom: '15px',
+  },
+  inputGroup: {
+    display: 'flex',
+    height: '45px',
+  },
+  inputStyle: {
+    backgroundColor: '#222',
+    border: '1px solid #333',
+    color: '#fff',
+    padding: '0 15px', 
+    flex: 1,
+    outline: 'none',
+  },
+  sendBtn: {
+    backgroundColor: '#fff',
+    border: 'none',
+    padding: '0 15px',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bottomBar: {
     borderTop: '1px solid #333',
     paddingTop: '20px',
-    marginTop: '10px',
+    textAlign: 'center',
+    fontSize: '13px',
+    color: '#9ca3af',
+    marginTop: '40px',
   }
 };
 

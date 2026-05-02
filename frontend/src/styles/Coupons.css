@@ -1,0 +1,353 @@
+/* Coupons.css */
+
+.coupons-container {
+  padding: 30px;
+}
+
+.loading-state {
+  padding: 40px;
+  text-align: center;
+}
+
+.coupons-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.header-title {
+  font-weight: 800;
+  font-size: 28px;
+}
+
+.add-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #111 0%, #333 100%);
+  color: #fff;
+  border: none;
+  padding: 27px 62px;
+  border-radius: 50px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.add-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  background: linear-gradient(135deg, #000 0%, #222 100%);
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+.coupon-card {
+  background-color: #fff;
+  padding: 25px;
+  border-radius: 25px;
+  border: 2px dashed #e2e8f0;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.coupon-card:hover {
+  border-color: #111;
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.coupon-card::before, .coupon-card::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: #f8fafc; /* Match container bg */
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.coupon-card::before {
+  left: -10px;
+  box-shadow: inset -3px 0 5px rgba(0,0,0,0.02);
+}
+
+.coupon-card::after {
+  right: -10px;
+  box-shadow: inset 3px 0 5px rgba(0,0,0,0.02);
+}
+
+.code-badge {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #111;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 20px;
+  color: #fff;
+  margin-bottom: 12px;
+  letter-spacing: 2px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.discount-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #10b981;
+  font-weight: 800;
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.delete-btn {
+  background-color: #fff1f2;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.delete-btn:hover {
+  background-color: #fee2e2;
+  transform: scale(1.1);
+}
+
+.coupon-info {
+  margin-top: 20px;
+  border-top: 2px dashed #f1f5f9;
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.status-badge {
+  margin-top: 20px;
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.status-badge.active {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  color: #15803d;
+  box-shadow: 0 2px 8px rgba(21, 128, 61, 0.1);
+}
+
+.status-badge.expired {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #b91c1c;
+  box-shadow: 0 2px 8px rgba(185, 28, 28, 0.1);
+}
+
+.no-coupons {
+  color: #94a3b8;
+  grid-column: 1/-1;
+  text-align: center;
+  padding: 60px;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.6);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 40px;
+  width: 100%;
+  max-width: 550px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: modalIn 0.3s ease-out;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.close-btn {
+  background-color: #f1f5f9;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  background-color: #e2e8f0;
+  color: #1e293b;
+  transform: rotate(90deg);
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.label-style {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.input-style {
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 15px;
+  border: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+  outline: none;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.input-style:focus {
+  border-color: #111;
+  background-color: #fff;
+  box-shadow: 0 0 0 4px rgba(0,0,0,0.05);
+}
+
+.generate-btn {
+  width: 100%;
+  margin-top: 30px;
+  background: linear-gradient(135deg, #111 0%, #333 100%);
+  color: #fff;
+  border: none;
+  padding: 18px;
+  border-radius: 50px;
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.generate-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+  background: linear-gradient(135deg, #000 0%, #222 100%);
+}
+
+.generate-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .coupons-container {
+    padding: 20px;
+  }
+
+  .coupons-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    text-align: center;
+    width: 100%;
+  }
+
+  .header-title {
+    font-size: 24px;
+    width: 100%;
+  }
+
+  .add-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .grid-container {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .coupon-card {
+    padding: 20px;
+  }
+
+  .code-badge {
+    font-size: 18px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .modal-content {
+    padding: 30px 20px;
+    border-radius: 30px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}

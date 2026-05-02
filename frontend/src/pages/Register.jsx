@@ -1,154 +1,212 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios"; // YE LINE ADD KAREIN
+// Importing React and necessary hooks
+import React, { useState, useEffect } from 'react';
+import axios from 'axios'; // For API calls
+import { useNavigate, Link } from 'react-router-dom'; // For navigation
+import { AlertCircle, XCircle, Loader2 } from 'lucide-react'; // Icons
+import toast, { Toaster } from 'react-hot-toast'; // For notifications
+import '../styles/Register.css'; // Styling file
 
 const Register = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  // State for user data (Name, Email, Password)
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    password: '',
+  });
+
+  // States for handling errors
+  const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    try {
-      // Backend URL check karlein (5000 ya jo bhi aapka port hai)
-      const res = await axios.post("http://localhost:5000/api/auth/register", {
-        name,
-        email,
-        password,
-      });
+  // --- RESPONSIVE LOGIC (Mobile & Tablet check) ---
+  const [width, setWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  const isMobile = width < 768;
+  const isTablet = width >= 768 && width < 1024;
 
-      alert("Registration Successful!");
-      navigate("/login");
-    } catch (err) {
-      alert(err.response?.data?.msg || "Signup Failed");
+  // Validation logic (To check input fields)
+  const validateField = (name, value) => {
+    let errorMsg = '';
+    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    if (name === 'fullName' && (!value || value.trim().length < 3)) {
+      errorMsg = "Name must be at least 3 characters";
+    }
+    if (name === 'email' && (!value || !gmailRegex.test(value))) {
+      errorMsg = "Only valid Gmail addresses (name@gmail.com) are allowed";
+    }
+    if (name === 'password' && (!value || !passwordRegex.test(value))) {
+      errorMsg = "8+ chars, 1 Uppercase, 1 Number and 1 Symbol required";
+    }
+    return errorMsg;
+  };
+
+  // This function runs when the user types something
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    const fieldError = validateField(name, value);
+    if (fieldError) {
+      setErrors((prev) => ({ ...prev, [name]: fieldError }));
+    } else {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+
+    if (serverError) {
+      setServerError('');
     }
   };
 
+  // Check if the entire form is correctly filled
+  const isFormValid = () => {
+    return (
+      formData.fullName.trim().length >= 3 &&
+      /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(formData.email) &&
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(formData.password)
+    );
+  };
+
+  // Function to submit the form
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (isFormValid()) {
+      setIsLoading(true);
+      try {
+        // Sending registration request to backend
+        const res = await axios.post('http://localhost:5004/api/auth/register', {
+          name: formData.fullName.trim(),
+          email: formData.email.toLowerCase(),
+          password: formData.password
+        });
+        
+        if (res.data.token) {
+          localStorage.setItem('token', res.data.token); // Save token
+          toast.success("Account created successfully!");
+          navigate('/'); // Redirect to home page
+          window.location.reload();
+        }
+      } catch (err) {
+        // Show error if registration fails
+        if (err.response && err.response.data) {
+          const { message, msg, errors: backendErrors } = err.response.data;
+          setServerError(message || msg || "Registration failed");
+          
+          if (backendErrors && backendErrors.length > 0) {
+            const newBackendErrors = {};
+            backendErrors.forEach(e => {
+              const field = e.path || e.param;
+              if (field === 'name') newBackendErrors.fullName = e.msg;
+              else newBackendErrors[field] = e.msg;
+            });
+            setErrors(prev => ({...prev, ...newBackendErrors}));
+          }
+        } else {
+          setServerError("Something went wrong");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
 
   return (
-    <div style={styles.pageBackground}>
-      <div style={styles.card}>
-        <h2 style={styles.title}>Create Account</h2>
-        <p style={styles.subtitle}>
-          SmartShop join karne ke liye details bharein
-        </p>
+    <div className="register-container" style={{ margin: isMobile ? '40px auto' : isTablet ? '60px auto' : '80px auto', width: isMobile ? '90%' : isTablet ? '380px' : '400px', padding: isMobile ? '20px' : isTablet ? '25px' : '30px' }}>
+      <form className="register-form" onSubmit={handleSubmit} noValidate>
+        <h2 style={{fontSize: isMobile ? '24px' : isTablet ? '26px' : '28px'}}>Create Account</h2>
 
-        <form onSubmit={handleRegister} style={styles.form}>
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Full Name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              style={styles.input}
-              placeholder="Your Name"
-              required
-            />
+        {serverError && (
+          <div className="error-box">
+            <AlertCircle size={18} /> <span>{serverError}</span>
           </div>
+        )}
 
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Email Address</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={styles.input}
-              placeholder="user@example.com"
-              required
-            />
-          </div>
+        {/* Full Name Field */}
+        <div className="input-group">
+          <label style={{fontSize: '13px', fontWeight: '700', color: '#666'}}>Full Name</label>
+          <input
+            type="text"
+            name="fullName"
+            placeholder="Enter your name"
+            className={errors.fullName ? 'input-error' : ''}
+            value={formData.fullName}
+            onChange={handleChange}
+          />
+          {errors.fullName && <p className="field-error-msg"><XCircle size={14}/> {errors.fullName}</p>}
+        </div>
 
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={styles.input}
-              placeholder="••••••••"
-              required
-            />
-          </div>
+        {/* Email Field */}
+        <div className="input-group">
+          <label style={{fontSize: '13px', fontWeight: '700', color: '#666'}}>Email Address</label>
+          <input
+            type="email"
+            name="email"
+            placeholder="name@gmail.com"
+            className={errors.email ? 'input-error' : ''}
+            value={formData.email}
+            onChange={handleChange}
+          />
+          {errors.email && <p className="field-error-msg"><XCircle size={14}/> {errors.email}</p>}
+        </div>
 
-          <button type="submit" style={styles.button}>
-            Sign Up
-          </button>
-        </form>
+        {/* Password Field */}
+        <div className="input-group">
+          <label style={{fontSize: '13px', fontWeight: '700', color: '#666'}}>Password</label>
+          <input
+            type="password"
+            name="password"
+            placeholder="••••••••"
+            className={errors.password ? 'input-error' : ''}
+            value={formData.password}
+            onChange={handleChange}
+          />
+          {errors.password && <p className="field-error-msg"><XCircle size={14}/> {errors.password}</p>}
+        </div>
 
-        <div style={styles.footer}>
-          <p style={styles.footerText}>
-            Pehle se account hai?{" "}
-            <Link to="/login" style={styles.loginLink}>
-              Login karein
-            </Link>
+        {/* Submit Button */}
+        <button 
+          type="submit" 
+          className="signup-btn"
+          disabled={!isFormValid() || isLoading}
+          style={{ 
+            opacity: (!isFormValid() || isLoading) ? 0.6 : 1, 
+            cursor: (!isFormValid() || isLoading) ? 'not-allowed' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '10px'
+          }}
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="animate-spin" size={20} />
+              Creating Account...
+            </>
+          ) : (
+            'Sign Up'
+          )}
+        </button>
+
+        {/* Login Page Link */}
+        <div className="login-link-container">
+          <p>
+            Already have an account? <Link to="/login" className="login-link">Sign In Here</Link>
           </p>
         </div>
-      </div>
+      </form>
     </div>
   );
-};
-
-// --- Styles (Matching Login Design) ---
-const styles = {
-  pageBackground: {
-    minHeight: "85vh",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#f4f6f8",
-    padding: "20px",
-  },
-  card: {
-    backgroundColor: "#fff",
-    padding: "40px",
-    borderRadius: "16px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-    width: "100%",
-    maxWidth: "400px",
-  },
-  title: {
-    fontSize: "24px",
-    fontWeight: "bold",
-    color: "#111",
-    marginBottom: "8px",
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: "15px",
-    color: "#666",
-    marginBottom: "30px",
-    textAlign: "center",
-  },
-  form: { display: "flex", flexDirection: "column", gap: "15px" },
-  inputGroup: { display: "flex", flexDirection: "column", gap: "8px" },
-  label: { fontSize: "14px", fontWeight: "600", color: "#333" },
-  input: {
-    padding: "12px 16px",
-    borderRadius: "8px",
-    border: "1px solid #ddd",
-    fontSize: "15px",
-    outline: "none",
-  },
-  button: {
-    backgroundColor: "#111",
-    color: "#fff",
-    padding: "14px",
-    borderRadius: "8px",
-    fontSize: "16px",
-    fontWeight: "bold",
-    border: "none",
-    cursor: "pointer",
-    marginTop: "10px",
-  },
-  footer: {
-    marginTop: "25px",
-    textAlign: "center",
-    borderTop: "1px solid #eee",
-    paddingTop: "20px",
-  },
-  footerText: { fontSize: "14px", color: "#555", margin: 0 },
-  loginLink: { color: "#10b981", fontWeight: "bold", textDecoration: "none" },
 };
 
 export default Register;

@@ -6,8 +6,7 @@ require('dotenv').config();
 const seedAdmin = async () => {
   try {
     // MongoDB connection (Check your .env for MONGO_URI)
-    await mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/your_db_name");
-    console.log("Connected to MongoDB...");
+    await mongoose.connect(process.env.MONGO_URI);
 
     const adminEmail = "khuzaima@gmail.com";
     const adminPass = "khuzaima";
@@ -26,9 +25,9 @@ const seedAdmin = async () => {
       });
 
       await newAdmin.save();
-      console.log("✅ Admin added to 'admins' section successfully!");
+      console.log("Admin added to 'admins' section successfully!");
     } else {
-      console.log("ℹ️ Admin already exists in 'admins' section.");
+      console.log("Admin already exists in 'admins' section.");
     }
 
     process.exit();

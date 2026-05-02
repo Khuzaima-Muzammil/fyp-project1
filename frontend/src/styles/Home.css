@@ -1,0 +1,229 @@
+/* Home.css */
+.home-container {
+  padding: 40px 6%;
+}
+
+.banner-section {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 80px;
+}
+
+.banner-card {
+  border-radius: var(--radius-lg);
+  display: flex;
+  position: relative;
+  overflow: hidden;
+  padding: 60px;
+  transition: all 0.4s ease;
+}
+
+.main-banner {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F1F5F9 100%);
+  border: 1px solid var(--border-color);
+  width: 65%;
+  align-items: center;
+  box-shadow: var(--shadow-soft);
+}
+
+.main-banner:hover {
+  box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+  transform: translateY(-5px);
+}
+
+.sale-banner {
+  background: #F1F5F9; /* Very light subtle gray */
+  color: #111;
+  width: 35%;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+.banner-content {
+  position: relative;
+  z-index: 10;
+  max-width: 60%;
+}
+
+.banner-subtitle {
+  color: var(--accent-color);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+}
+
+.banner-title {
+  font-size: 54px;
+  font-weight: 800;
+  margin-bottom: 30px;
+  line-height: 1.1;
+  color: var(--primary-color);
+}
+
+.sale-banner .banner-subtitle {
+  color: #EAB308;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.sale-banner .banner-title {
+  color: #111;
+  font-size: 38px;
+}
+
+/* Product Grid - 4 items per row */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 products per row */
+  gap: 30px;
+}
+
+@media (max-width: 1200px) {
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.banner-img {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  height: 95%;
+  object-fit: contain;
+  z-index: 1;
+  transition: transform 0.6s ease;
+}
+
+.main-banner:hover .banner-img {
+  transform: scale(1.05) translateX(-10px);
+}
+
+.shop-now-btn {
+  padding: 12px 28px;
+  border-radius: 50px;
+  background-color: #111;
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.shop-now-btn:hover {
+  transform: translateY(-2px);
+  background-color: #000;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.grab-now-btn {
+  padding: 12px 28px; /* Matched with shop-now-btn */
+  border-radius: 50px;
+  background-color: #111; 
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  width: fit-content; /* Prevent stretching */
+}
+
+.grab-now-btn:hover {
+  transform: translateY(-2px);
+  background-color: #333;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+.section-header h2 {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.view-all-btn {
+  font-weight: 700;
+  color: #111;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: 50px;
+  background-color: #fff;
+  border: 1px solid #eee;
+  font-size: 13px;
+  margin-left: auto; /* Push to right */
+  cursor: pointer;
+}
+
+.view-all-btn:hover {
+  background-color: #f9f9f9;
+  border-color: #111;
+}
+
+@media (max-width: 1100px) {
+  .banner-section {
+    flex-direction: column;
+  }
+  .main-banner, .sale-banner {
+    width: 100%;
+    padding: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-container {
+    padding: 20px 4%;
+  }
+
+  .banner-title {
+    font-size: 36px;
+  }
+
+  .banner-card {
+    padding: 30px;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .section-header h2 {
+    font-size: 22px;
+  }
+
+  .view-all-btn {
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .banner-title {
+    font-size: 28px;
+  }
+  
+  .banner-content {
+    max-width: 100%;
+  }
+
+  .banner-img {
+    opacity: 0.3; /* Make image background-like on very small screens */
+  }
+}

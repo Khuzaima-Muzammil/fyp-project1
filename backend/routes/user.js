@@ -13,7 +13,7 @@ router.post('/update-cart', auth, async (req, res) => {
       { cart: cart },
       { new: true }
     );
-    if (!user) return res.status(404).json({ msg: 'User not found' });
+    if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user.cart);
   } catch (err) {
     console.error(err.message);

@@ -1,55 +1,60 @@
+// Importing React and icons
 import React, { useContext, useState, useEffect } from "react";
-import { ShoppingCart, Search, LogOut, LayoutDashboard } from "lucide-react"; 
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ShopContext } from "../context/ShopContext";
+import { ShoppingCart, Search, LogOut, LayoutDashboard, Menu, X } from "lucide-react"; // Icons library
+import { Link, useNavigate, useLocation } from "react-router-dom"; // Navigation
+import { ShopContext } from "../context/ShopContext"; // Data access
+import "../styles/Navbar.css"; // CSS styles
 
 const Navbar = () => {
-  // --- ShopContext se searchTerm aur setSearchTerm nikala ---
+  // Accessing context data
   const { cart = [], user, logout, searchTerm, setSearchTerm } = useContext(ShopContext);
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigate = useNavigate(); // Navigation function
+  const location = useLocation(); // Current location
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // Mobile menu state
 
-  // --- MOBILE CHECK LOGIC ---
+  // Determine screen width for responsive design
   const [width, setWidth] = useState(window.innerWidth);
   useEffect(() => {
     const handleResize = () => setWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []); //end pr [] is liye kai ye aik dfa hi chlai yani agr kuch hota hai component ya button change hota tu is ko dobara na chlae
+  }, []);
 
+  // Close menu on navigation
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location.pathname]);
+
+  // Set mobile view if screen width is less than 768px
   const isMobile = width < 768;
-
-  const showSearch = location.pathname === "/" || location.pathname === "/all-products";
+  // Show search bar only on specific pages
+  const showSearch = location.pathname === "/";
   const isProfilePage = location.pathname === "/profile";
   const isAdminPage = location.pathname.includes("admin");
 
+  // Search handler
   const handleSearch = (e) => {
     e.preventDefault();
-    // Agar user Enter dabaye toh wo all-products page par chala jaye
     if (searchTerm.trim()) {
-      navigate(`/all-products`);
+      navigate(`/all-products`); // Redirect to products page on search
     }
   };
 
   return (
-    <nav style={{...navStyle, padding: isMobile ? "15px 4%" : "15px 7%"}}>
-      <Link to="/" style={{ textDecoration: "none", color: "#111" }}>
-        <h1 style={{...logoTextStyle, fontSize: isMobile ? "18px" : "24px"}}>LUMIERE</h1>
+    <nav className="navbar-container">
+      {/* Website Logo */}
+      <Link to="/" className="navbar-logo">
+        <h1>LUMIERE</h1>
       </Link>
 
-      {/* Responsive Search Bar */}
+      {/* Search Bar (Conditional) */}
       {showSearch ? (
-        <form onSubmit={handleSearch} style={{
-          ...searchBarContainer, 
-          width: isMobile ? "45%" : "30%", 
-          padding: isMobile ? "8px 12px" : "10px 20px"
-        }}>
+        <form onSubmit={handleSearch} className="search-bar-container">
           <Search size={isMobile ? 14 : 18} color="#9ca3af" />
           <input
             type="text"
+            className="search-input"
             placeholder={isMobile ? "Search..." : "Search products..."}
-            style={{...searchInput, fontSize: isMobile ? "12px" : "14px"}}
-            // --- Local state ki jagah Global searchTerm use kiya ---
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)} 
           />
@@ -58,74 +63,105 @@ const Navbar = () => {
         <div style={{ flex: 1 }}></div> 
       )}
 
-      <div style={{ display: "flex", alignItems: "center", gap: isMobile ? "12px" : "25px" }}>
+      {/* Right side buttons (Cart, Profile, Login) */}
+      <div className="nav-right-section">
         
-        {/* --- ADMIN PANEL LINK --- */}
+        {/* Admin Panel button if user is admin */}
         {user && user.role === 'admin' && (
-          <Link to="/admin-dashboard" style={isMobile ? adminIconStyle : adminBtnStyle}>
+          <Link to="/admin-dashboard" className={isMobile ? "admin-icon-mobile" : "admin-btn-desktop"}>
             {isMobile ? <LayoutDashboard size={20} /> : "Admin Panel"}
           </Link>
         )}
 
+        {/* Desktop menu links */}
         {!isMobile && (
-          <Link to="/all-products" style={navLink}>
-            Products
-          </Link>
+          <>
+            <Link to="/budget-optimizer" className="nav-link-item" style={{ color: '#EAB308' }}>
+              Optimizer
+            </Link>
+            <Link to="/all-products" className="nav-link-item">
+              Products
+            </Link>
+          </>
         )}
 
-        <Link to="/cart" style={{ position: "relative", color: "#111" }}>
-          <ShoppingCart size={isMobile ? 20 : 22} />
-          {cart.length > 0 && <span style={cartCount}>{cart.length}</span>}
-        </Link>
+        <div className="nav-profile-group">
+          {/* Shopping Cart icon */}
+          <Link to="/cart" className="cart-icon-wrapper">
+            <ShoppingCart size={isMobile ? 20 : 22} />
+            {cart.length > 0 && <span className="cart-badge">{cart.length}</span>}
+          </Link>
 
-        {user ? (
-          <div style={{ display: "flex", alignItems: "center", gap: isMobile ? "8px" : "15px" }}>
-            <div onClick={() => navigate("/profile")} style={{
-              ...avatarCircle, 
-              width: isMobile ? "32px" : "38px", 
-              height: isMobile ? "32px" : "38px"
-            }}>
-              {user.profilePic ? (
-                <img src={user.profilePic} alt="User" style={avatarImg} />
-              ) : (
-                <span style={{ fontSize: isMobile ? "12px" : "14px" }}>
-                  {user.username ? user.username[0].toUpperCase() : "U"}
-                </span>
+          {/* User profile or login button */}
+          {user ? (
+            <div className="profile-section">
+              <div onClick={() => navigate("/profile")} className="avatar-circle">
+                {user.profilePic ? (
+                  <img src={user.profilePic} alt="User" className="avatar-img" />
+                ) : (
+                  <span>
+                    {user.username ? user.username[0].toUpperCase() : "U"}
+                  </span>
+                )}
+              </div>
+              
+              {!isMobile && !isProfilePage && !isAdminPage && (
+                <button onClick={logout} className="logout-btn" title="Logout">
+                  <LogOut size={20} />
+                </button>
               )}
             </div>
-            
-            {!isProfilePage && !isAdminPage && (
-              <button onClick={logout} style={logoutBtn} title="Logout">
-                <LogOut size={20} />
-              </button>
-            )}
-          </div>
-        ) : (
-          <Link to="/login" style={{
-            ...loginBtn, 
-            padding: isMobile ? "8px 15px" : "10px 25px",
-            fontSize: isMobile ? "12px" : "14px"
-          }}>
-            Login
-          </Link>
+          ) : (
+            <Link to="/login" className="login-btn-styled">
+              Login
+            </Link>
+          )}
+        </div>
+
+        {/* Hamburger Menu Icon for Mobile */}
+        {isMobile && (
+          <button 
+            className="hamburger-btn" 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         )}
       </div>
+
+      {/* Mobile Menu Drawer */}
+      {isMobile && (
+        <div className={`mobile-menu-overlay ${isMenuOpen ? 'open' : ''}`} onClick={() => setIsMenuOpen(false)}>
+          <div className={`mobile-menu-content ${isMenuOpen ? 'open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div className="mobile-menu-header">
+              <h2>LUMIERE</h2>
+              <button onClick={() => setIsMenuOpen(false)}><X size={24} /></button>
+            </div>
+            <div className="mobile-menu-links">
+              <Link to="/" className="mobile-nav-link">Home</Link>
+              <Link to="/all-products" className="mobile-nav-link">Products</Link>
+              <Link to="/budget-optimizer" className="mobile-nav-link" style={{ color: '#eab308' }}>Budget Optimizer</Link>
+              <Link to="/cart" className="mobile-nav-link">Cart ({cart.length})</Link>
+              {user && user.role === 'admin' && (
+                <Link to="/admin-dashboard" className="mobile-nav-link" style={{ color: '#ef4444' }}>Admin Panel</Link>
+              )}
+              {user ? (
+                <>
+                  <Link to="/profile" className="mobile-nav-link">My Profile</Link>
+                  <button onClick={logout} className="mobile-logout-btn">
+                    <LogOut size={18} style={{ marginRight: '10px' }} /> Logout
+                  </button>
+                </>
+              ) : (
+                <Link to="/login" className="mobile-nav-link">Login</Link>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
-
-// --- Styles (Same as before) ---
-const adminBtnStyle = { textDecoration: "none", color: "#ef4444", fontWeight: "800", fontSize: "14px", border: "2px solid #ef4444", padding: "8px 15px", borderRadius: "50px", transition: "0.3s", backgroundColor: "transparent" };
-const adminIconStyle = { color: "#ef4444", display: "flex", alignItems: "center" };
-const navStyle = { display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f3f4f6", backgroundColor: "#fff", position: "sticky", top: 0, zIndex: 1000 };
-const logoTextStyle = { margin: 0, fontWeight: "900", letterSpacing: "-1.5px", textTransform: "uppercase" };
-const searchBarContainer = { display: "flex", alignItems: "center", backgroundColor: "#f3f4f6", borderRadius: "50px" };
-const searchInput = { border: "none", background: "none", outline: "none", marginLeft: "10px", width: "100%" };
-const navLink = { textDecoration: "none", color: "#111", fontWeight: "700", fontSize: "15px" };
-const cartCount = { position: "absolute", top: "-10px", right: "-10px", background: "#111", color: "white", borderRadius: "50%", padding: "2px 6px", fontSize: "10px", fontWeight: "bold" };
-const avatarCircle = { cursor: "pointer", backgroundColor: "#111", color: "#fff", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", overflow: "hidden", border: "1px solid #eee" };
-const avatarImg = { width: "100%", height: "100%", objectFit: "cover" };
-const logoutBtn = { border: "none", background: "none", cursor: "pointer", color: "#6b7280", display: "flex", alignItems: "center" };
-const loginBtn = { textDecoration: "none", backgroundColor: "#111", color: "#fff", borderRadius: "50px", fontWeight: "700" };
 
 export default Navbar;

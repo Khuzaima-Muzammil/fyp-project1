@@ -1,14 +1,35 @@
-import React from 'react';
+// Importing React and necessary hooks
+import React, { useState, useEffect } from 'react';
 
 const Privacy = () => {
+  // --- RESPONSIVE LOGIC (Mobile & Tablet check) ---
+  const [width, setWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  const isMobile = width < 768;
+  const isTablet = width >= 768 && width < 1024;
+
   return (
-    <div style={styles.container}>
-      <h1 style={styles.heading}>Privacy Policy</h1>
-      <p style={styles.text}>Aapki privacy hamari pehli tarjeeh (priority) hai.</p>
-      <h3 style={styles.subHeading}>1. Data Collection</h3>
-      <p style={styles.text}>Hum sirf wahi data collect karte hain jo order process karne ke liye zaroori hota hai (jaise naam, address, email).</p>
-      <h3 style={styles.subHeading}>2. Data Security</h3>
-      <p style={styles.text}>Aapka data hamare servers par bilkul mehfooz hai aur kisi third-party ko nahi becha jata.</p>
+    <div style={{
+      ...styles.container,
+      margin: isMobile ? '20px auto' : isTablet ? '30px auto' : '40px auto',
+      padding: isMobile ? '20px' : isTablet ? '25px' : '30px',
+      width: isMobile ? '90%' : isTablet ? '85%' : '800px'
+    }}>
+      {/* Main page heading */}
+      <h1 style={{...styles.heading, fontSize: isMobile ? '24px' : isTablet ? '26px' : '28px'}}>Privacy Policy</h1>
+      <p style={styles.text}>Your privacy is our top priority. We protect your data through SSL encryption.</p>
+      
+      {/* Point 1: Data collection */}
+      <h3 style={{...styles.subHeading, fontSize: isMobile ? '18px' : isTablet ? '19px' : '20px'}}>1. Data Collection</h3>
+      <p style={styles.text}>We only collect data that is necessary for processing your order (such as name, address, email). We also use cookies to improve website performance.</p>
+      
+      {/* Point 2: Data security */}
+      <h3 style={{...styles.subHeading, fontSize: isMobile ? '18px' : isTablet ? '19px' : '20px'}}>2. Data Security</h3>
+      <p style={styles.text}>Your data is completely safe on our servers and is not sold to any third party. Your data is only used for order processing and providing a better user experience.</p>
     </div>
   );
 };

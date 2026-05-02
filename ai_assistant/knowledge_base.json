@@ -1,0 +1,38 @@
+{
+  "website_info": {
+    "shipping": {
+      "policy": "Hamari delivery pure Pakistan mein Rs. 250 hai. 5000 se upar ki shopping par delivery bilkul free hai.",
+      "time": "Bade shehron mein 2-3 din, jabke door daraz ilaqon mein 5-7 working days lagte hain.",
+      "tracking": "Order ship hone ke baad aapko SMS ke zariye tracking ID bhej di jati hai."
+    },
+    "returns_refunds": {
+      "policy": "Aap 7 dino ke andar product return ya exchange kar sakte hain agar wo original packing mein ho.",
+      "refund_time": "Refund process mein 48-72 ghante lagte hain jab humein product wapas mil jata hai.",
+      "conditions": "Used items ya damaged packaging wale products return nahi honge."
+    },
+    "privacy_policy": {
+      "data_usage": "Hum aapka data sirf order processing aur behtar user experience ke liye istemal karte hain.",
+      "security": "Aapka data SSL encryption ke zariye mehfooz rakha jata hai.",
+      "cookies": "Hum website ki performance behtar karne ke liye cookies use karte hain."
+    },
+    "contact": {
+      "email": "support@lumiere.com",
+      "phone": "+92-300-1234567",
+      "address": "Lumiere Fashion House, Gulberg III, Lahore, Pakistan",
+      "whatsapp": "+92-301-4361022",
+      "timing": "Hum Monday se Saturday, subah 9 baje se sham 6 baje tak dastyab hain."
+    },
+    "about": {
+      "brand": "Lumiere ek premium fashion brand hai jo high-quality kapde aur accessories faraham karta hai.",
+      "mission": "Hamara maqsad fashion ko sab ke liye asaan aur mayari banana hai."
+    },
+    "pages": {
+      "home": "/",
+      "shop": "/shop",
+      "cart": "/cart",
+      "profile": "/profile",
+      "checkout": "/checkout",
+      "orders": "/orders"
+    }
+  }
+}

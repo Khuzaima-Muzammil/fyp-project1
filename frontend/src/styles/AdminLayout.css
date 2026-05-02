@@ -1,0 +1,250 @@
+.admin-layout-container {
+    min-height: 100vh;
+    width: 100vw;
+    background-color: #f4f7fe;
+    overflow-x: hidden;
+}
+
+.admin-navbar {
+    width: 100vw;
+    background-color: #ffffff;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.admin-nav-content {
+    width: 95%;
+    max-width: 1400px;
+    margin: 0 auto;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+@media (max-width: 1099px) {
+    .admin-nav-content {
+        height: 70px;
+    }
+}
+
+.admin-logo-link {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+@media (max-width: 767px) {
+    .admin-logo-link {
+        gap: 5px;
+    }
+}
+
+.admin-logo-circle {
+    width: 40px;
+    height: 40px;
+    background-color: #000;
+    color: #fff;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+@media (max-width: 767px) {
+    .admin-logo-circle {
+        width: 35px;
+        height: 35px;
+    }
+}
+
+.admin-logo-text {
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: #111;
+}
+
+@media (max-width: 767px) {
+    .admin-logo-text {
+        font-size: 1.2rem;
+    }
+}
+
+.admin-badge {
+    font-size: 0.7rem;
+    background-color: #ebf4ff;
+    color: #3182ce;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.admin-desktop-links {
+    display: flex;
+    gap: 2.5vw;
+}
+
+@media (max-width: 1299px) {
+    .admin-desktop-links {
+        gap: 1.5vw;
+    }
+}
+
+.admin-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: #718096;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: 0.2s;
+    height: 80px;
+}
+
+@media (max-width: 1099px) {
+    .admin-nav-link {
+        height: 50px;
+    }
+}
+
+.admin-nav-link.active {
+    color: #3182ce;
+    border-bottom: 3px solid #3182ce;
+}
+
+.admin-user-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.admin-username-desktop {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+    background-color: #f1f5f9;
+    padding: 6px 15px;
+    border-radius: 20px;
+}
+
+.admin-logout-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #e53e3e;
+    display: flex;
+    align-items: center;
+}
+
+.admin-mobile-toggle {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: #111;
+}
+
+/* --- Admin Mobile Side Drawer --- */
+.admin-mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+
+.admin-mobile-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.admin-mobile-menu {
+    position: fixed;
+    top: 0;
+    right: -300px; /* Slide from right */
+    width: 300px;
+    height: 100vh;
+    background-color: #fff;
+    z-index: 2001;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+}
+
+.admin-mobile-menu.open {
+    right: 0;
+}
+
+.admin-mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 25px 20px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.admin-mobile-header .admin-logo-text {
+    font-size: 1.1rem;
+    flex: 1;
+    margin-left: 10px;
+}
+
+.admin-mobile-header button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #64748b;
+}
+
+.admin-mobile-links {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 10px;
+    gap: 5px;
+}
+
+.admin-mobile-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 15px;
+    text-decoration: none;
+    color: #475569;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.2s;
+    font-size: 15px;
+}
+
+.admin-mobile-nav-link:hover {
+    background-color: #f8fafc;
+    color: #111;
+}
+
+.admin-mobile-nav-link.active {
+    background-color: #ebf4ff;
+    color: #3182ce;
+}
+
+.admin-main-area {
+    width: 100vw;
+    padding-top: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.admin-content-container {
+    width: 95%;
+    max-width: 1400px;
+}

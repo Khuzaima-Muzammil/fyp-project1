@@ -1,108 +1,148 @@
-import React, { useState, useEffect, useContext } from 'react';
+// Importing React and global context
+import React, { useState, useContext, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { ShopContext } from '../../context/ShopContext';
-import { LayoutDashboard, Package, ShoppingCart, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Users, Mail, LogOut, Menu, X, Settings, Ticket, BarChart3 } from 'lucide-react';
+import '../../styles/AdminLayout.css';
 
 const AdminLayout = () => {
+  // Extracting user and logout functions from ShopContext
   const { user, logout } = useContext(ShopContext);
   const location = useLocation();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  // --- RESPONSIVE LOGIC (To handle screen size) ---
+  const isMobile = windowWidth < 768;
+  const isTablet = windowWidth >= 768 && windowWidth < 1100;
 
   useEffect(() => {
-    const handleResize = () => {
-      const mobile = window.innerWidth < 1024;
-      setIsMobile(mobile);
-      if (!mobile) setIsSidebarOpen(true);
-    };
+    const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
-    handleResize();
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const getLinkStyle = (path) => (location.pathname === path ? navLinkActive : navLinkStyle);
+  const getLinkStyle = (path) => ({
+    ...(location.pathname === path ? activeLink : navLink),
+    height: (isMobile || isTablet) ? '50px' : '80px',
+    borderBottom: location.pathname === path ? '3px solid #3182ce' : 'none'
+  });
+
+  const getMobileLinkStyle = (path) => ({
+    ...mobileNavLink,
+    backgroundColor: location.pathname === path ? '#ebf4ff' : 'transparent',
+    color: location.pathname === path ? '#3182ce' : '#2d3748',
+    borderLeft: location.pathname === path ? '4px solid #3182ce' : 'none',
+    paddingLeft: location.pathname === path ? 'calc(5% - 4px)' : '5%'
+  });
 
   return (
-    <div style={containerStyle}>
-      {/* Mobile Overlay */}
-      {isMobile && isSidebarOpen && (
-        <div style={overlayStyle} onClick={() => setIsSidebarOpen(false)} />
-      )}
-
-      {/* Sidebar */}
-      <aside style={{ 
-        ...sidebarStyle, 
-        transform: isSidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
-        position: isMobile ? 'fixed' : 'sticky',
-        zIndex: 1001 
-      }}>
-        <div style={sidebarLogoContainer}>
-          <div style={logoCircle}>L</div>
-          <h2 style={{ color: '#fff', fontSize: '18px', margin: 0 }}>ADMIN</h2>
-          {isMobile && <X onClick={() => setIsSidebarOpen(false)} style={{marginLeft: 'auto', cursor:'pointer'}} />}
-        </div>
-        
-        <nav style={navContainer}>
-          <p style={sectionTitle}>MAIN MENU</p>
-          <Link to="/admin-dashboard" style={getLinkStyle('/admin-dashboard')} onClick={() => isMobile && setIsSidebarOpen(false)}>
-            <LayoutDashboard size={18} /> Dashboard
-          </Link>
-          <Link to="/admin/manage-products" style={getLinkStyle('/admin/manage-products')} onClick={() => isMobile && setIsSidebarOpen(false)}>
-            <Package size={18} /> Products
-          </Link>
-          <Link to="/admin/manage-orders" style={getLinkStyle('/admin/manage-orders')} onClick={() => isMobile && setIsSidebarOpen(false)}>
-            <ShoppingCart size={18} /> Orders
-          </Link>
+    <div className="admin-layout-container">
+      {/* --- Full Width Navbar --- */}
+      <nav className="admin-navbar">
+        <div className="admin-nav-content">
           
-          <button onClick={logout} style={logoutBtnStyle}>
-            <LogOut size={18} /> Logout
-          </button>
-        </nav>
-      </aside>
+          {/* Logo Section */}
+          <Link to="/" className="admin-logo-link">
+            <div className="admin-logo-circle">L</div>
+            <span className="admin-logo-text">LUMIERE {!isMobile && <small className="admin-badge">ADMIN</small>}</span>
+          </Link>
 
-      {/* Main Content Area */}
-      <main style={{ ...mainContentStyle, padding: isMobile ? '20px' : '40px' }}>
-        {/* Header jo har page par rahega */}
-        <header style={headerStyle}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            {isMobile && (
-              <button onClick={() => setIsSidebarOpen(true)} style={menuToggleBtn}>
-                <Menu size={24} />
-              </button>
+          {/* Desktop Links (For large screens) */}
+          {!isMobile && !isTablet && (
+            <div className="admin-desktop-links">
+              <Link to="/admin-dashboard" className={`admin-nav-link ${location.pathname === '/admin-dashboard' ? 'active' : ''}`}>
+                <LayoutDashboard size={18} /> Dashboard
+              </Link>
+              <Link to="/admin/manage-products" className={`admin-nav-link ${location.pathname === '/admin/manage-products' ? 'active' : ''}`}>
+                <Package size={18} /> Products
+              </Link>
+              <Link to="/admin/manage-orders" className={`admin-nav-link ${location.pathname === '/admin/manage-orders' ? 'active' : ''}`}>
+                <ShoppingCart size={18} /> Orders
+              </Link>
+              <Link to="/admin/manage-users" className={`admin-nav-link ${location.pathname === '/admin/manage-users' ? 'active' : ''}`}>
+                <Users size={18} /> Users
+              </Link>
+              <Link to="/admin/newsletter" className={`admin-nav-link ${location.pathname === '/admin/newsletter' ? 'active' : ''}`}>
+                <Mail size={18} /> Newsletter
+              </Link>
+              <Link to="/admin/reports" className={`admin-nav-link ${location.pathname === '/admin/reports' ? 'active' : ''}`}>
+                <BarChart3 size={18} /> Reports
+              </Link>
+              <Link to="/admin/coupons" className={`admin-nav-link ${location.pathname === '/admin/coupons' ? 'active' : ''}`}>
+                <Ticket size={18} /> Coupons
+              </Link>
+              <Link to="/admin/settings" className={`admin-nav-link ${location.pathname === '/admin/settings' ? 'active' : ''}`}>
+                <Settings size={18} /> Settings
+              </Link>
+            </div>
+          )}
+
+          {/* User Section (Username and logout) */}
+          <div className="admin-user-section">
+            {!isMobile && !isTablet && <span className="admin-username-desktop">{user?.username || 'Admin'}</span>}
+            
+            <button onClick={logout} className="admin-logout-btn" title="Logout">
+              <LogOut size={isMobile ? 18 : 20} />
+            </button>
+            
+            {/* Mobile/Tablet Toggle Button */}
+            {(isMobile || isTablet) && (
+              <div className="admin-mobile-toggle" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                {isMenuOpen ? <X size={isMobile ? 24 : 28} /> : <Menu size={isMobile ? 24 : 28} />}
+              </div>
             )}
-            <div>
-              <h1 style={{ margin: 0, fontSize: isMobile ? '20px' : '26px', fontWeight: '800', textTransform: 'capitalize' }}>
-                {location.pathname.replace('/admin/', '').replace('-', ' ') || 'Dashboard'}
-              </h1>
+          </div>
+        </div>
+
+        {/* Mobile/Tablet Dropdown Menu (Side Drawer) */}
+        {(isMobile || isTablet) && (
+          <div className={`admin-mobile-overlay ${isMenuOpen ? 'open' : ''}`} onClick={() => setIsMenuOpen(false)}>
+            <div className={`admin-mobile-menu ${isMenuOpen ? 'open' : ''}`} onClick={e => e.stopPropagation()}>
+              <div className="admin-mobile-header">
+                <div className="admin-logo-circle">L</div>
+                <span className="admin-logo-text">LUMIERE ADMIN</span>
+                <button onClick={() => setIsMenuOpen(false)}><X size={24} /></button>
+              </div>
+              <div className="admin-mobile-links">
+                <Link to="/admin-dashboard" onClick={() => setIsMenuOpen(false)} className={`admin-mobile-nav-link ${location.pathname === '/admin-dashboard' ? 'active' : ''}`}>
+                  <LayoutDashboard size={18} /> Dashboard
+                </Link>
+                <Link to="/admin/manage-products" onClick={() => setIsMenuOpen(false)} className={`admin-mobile-nav-link ${location.pathname === '/admin/manage-products' ? 'active' : ''}`}>
+                  <Package size={18} /> Products
+                </Link>
+                <Link to="/admin/manage-orders" onClick={() => setIsMenuOpen(false)} className={`admin-mobile-nav-link ${location.pathname === '/admin/manage-orders' ? 'active' : ''}`}>
+                  <ShoppingCart size={18} /> Orders
+                </Link>
+                <Link to="/admin/manage-users" onClick={() => setIsMenuOpen(false)} className={`admin-mobile-nav-link ${location.pathname === '/admin/manage-users' ? 'active' : ''}`}>
+                  <Users size={18} /> Users
+                </Link>
+                <Link to="/admin/newsletter" onClick={() => setIsMenuOpen(false)} className={`admin-mobile-nav-link ${location.pathname === '/admin/newsletter' ? 'active' : ''}`}>
+                  <Mail size={18} /> Newsletter
+                </Link>
+                <Link to="/admin/reports" onClick={() => setIsMenuOpen(false)} className={`admin-mobile-nav-link ${location.pathname === '/admin/reports' ? 'active' : ''}`}>
+                  <BarChart3 size={18} /> Reports
+                </Link>
+                <Link to="/admin/coupons" onClick={() => setIsMenuOpen(false)} className={`admin-mobile-nav-link ${location.pathname === '/admin/coupons' ? 'active' : ''}`}>
+                  <Ticket size={18} /> Coupons
+                </Link>
+                <Link to="/admin/settings" onClick={() => setIsMenuOpen(false)} className={`admin-mobile-nav-link ${location.pathname === '/admin/settings' ? 'active' : ''}`}>
+                  <Settings size={18} /> Settings
+                </Link>
+              </div>
             </div>
           </div>
-          <div style={userProfileBadge}>
-            <span style={{fontWeight: '600', fontSize: '12px'}}>{isMobile ? 'Admin' : user?.username || 'Admin'}</span>
-          </div>
-        </header>
+        )}
+      </nav>
 
-        {/* YAHAN AAPKE BAAQI PAGES (Dashboard, Orders, etc) RENDER HONGE */}
-        <Outlet /> 
-
+      {/* --- Main Content Area --- */}
+      <main className="admin-main-area">
+        <div className="admin-content-container">
+          <Outlet />
+        </div>
       </main>
     </div>
   );
 };
-
-// --- Styles (Wahi purane wale hain) ---
-const containerStyle = { display: 'flex', minHeight: '100vh', backgroundColor: '#f8f9fc', width: '100%' };
-const overlayStyle = { position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000 };
-const sidebarStyle = { width: '260px', backgroundColor: '#0f172a', color: '#fff', display: 'flex', flexDirection: 'column', height: '100vh', transition: 'transform 0.3s ease', top: 0, left: 0 };
-const menuToggleBtn = { background: 'none', border: 'none', cursor: 'pointer', color: '#111', display: 'flex', alignItems: 'center', padding: '5px' };
-const sidebarLogoContainer = { padding: '25px', display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid #1e293b' };
-const logoCircle = { width: '30px', height: '30px', backgroundColor: '#3b82f6', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' };
-const navContainer = { padding: '15px', flex: 1 };
-const sectionTitle = { fontSize: '10px', fontWeight: '700', color: '#475569', letterSpacing: '1px', padding: '0 10px', marginBottom: '10px' };
-const navLinkStyle = { display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', color: '#94a3b8', textDecoration: 'none', fontSize: '14px', borderRadius: '8px', marginBottom: '4px' };
-const navLinkActive = { ...navLinkStyle, color: '#fff', backgroundColor: '#1e293b' };
-const logoutBtnStyle = { ...navLinkStyle, background: 'none', border: 'none', cursor: 'pointer', width: '100%', color: '#f87171', marginTop: '20px' };
-const mainContentStyle = { flex: 1, overflowY: 'auto' };
-const headerStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' };
-const userProfileBadge = { backgroundColor: '#fff', padding: '6px 12px', borderRadius: '50px', border: '1px solid #e2e8f0' };
 
 export default AdminLayout;

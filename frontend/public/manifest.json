@@ -1,8 +1,8 @@
 {
-  "short_name": "SmartShop",
-  "name": "SmartShop E-commerce App",
-  "start_url": ".",
-  "display": "standalone",
+  "short_name": "Lumiere",
+  "name": "Lumiere Store",
+  "start_url": "/",
+  "display": "browser",
   "theme_color": "#111111",
   "background_color": "#ffffff",
   "icons": [

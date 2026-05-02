@@ -1,147 +1,386 @@
+// React and context libraries
 import React, { useContext, useEffect, useState } from 'react';
-import { ShopContext } from '../context/ShopContext';
-import { useNavigate } from 'react-router-dom';
-import { Trash2, Plus, Minus, AlertTriangle } from 'lucide-react';
+import { ShopContext } from '../context/ShopContext'; // Data source
+import { useNavigate } from 'react-router-dom'; // Navigation
+import { Trash2, Plus, Minus, AlertTriangle, ArrowRight, Star, Loader2, Sparkles } from 'lucide-react'; // Icons
+import toast from 'react-hot-toast'; // Notifications
+import '../styles/Cart.css';
 
 const Cart = () => {
-  // NOTE: 'income' yahan ShopContext se li ja rahi hai
-  const { cart, user, removeFromCart, updateQuantity, loading, income } = useContext(ShopContext);
+  // Extracting cart, user, and budget information from context
+  const { 
+    cart, 
+    user, 
+    removeFromCart, 
+    updateQuantity, 
+    loading, 
+    income, 
+    addToCart, 
+    products, 
+    allProducts, 
+    swapCartItem, 
+    fetchProducts, 
+    cartTotal: totalAmount, 
+    shippingFee, 
+    finalTotal, 
+    isOverBudget, 
+    exceededAmount: overBudgetAmount, 
+    settings 
+  } = useContext(ShopContext);
+  
   const navigate = useNavigate();
+  const [suggestions, setSuggestions] = useState([]); // Budget-saving suggestions
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
 
-  // --- MOBILE CHECK LOGIC ---
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  // Fetch products to enable swap suggestions
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    if (fetchProducts) {
+      fetchProducts();
+    }
+  }, []);
+
+  // --- RESPONSIVE LOGIC (Mobile and Tablet) ---
+  const [width, setWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Redirect if not logged in
+  const isMobile = width < 768;
+  const isTablet = width >= 768 && width < 1024; // Tablet screen check
+
+  // Redirect to login if user is not authenticated
   useEffect(() => {
     if (!loading && !user) {
       navigate('/login');
     }
   }, [user, loading, navigate]);
 
-  if (loading) return <div style={{ textAlign: 'center', padding: '100px' }}>Loading...</div>;
-
-  const totalAmount = cart.reduce((acc, item) => acc + (item.price * (item.quantity || 1)), 0);
-  
-  // --- SMART BUDGET LOGIC ---
   const userBudget = Number(income) || 0;
-  const isOverBudget = userBudget > 0 && totalAmount > userBudget;
-  const overBudgetAmount = totalAmount - userBudget;
+
+  // --- SMART SWAP LOGIC (Replacing products to save budget) ---
+  useEffect(() => {
+    const generateLocalSuggestions = () => {
+      const productsToUse = allProducts && allProducts.length > 0 ? allProducts : products;
+      
+      if (cart.length > 0 && productsToUse && productsToUse.length > 0) {
+        setLoadingSuggestions(true);
+        
+        const timer = setTimeout(() => {
+          let newSuggestions = [];
+          // Sorting cart items from highest to lowest price
+          const sortedCart = [...cart].sort((a, b) => (b.price * (b.quantity || 1)) - (a.price * (a.quantity || 1)));
+
+          for (let item of sortedCart) {
+            const itemId = (item._id || item.id);
+            const itemPrice = Number(item.price);
+            
+            let fullProduct = allProducts?.find(p => (p._id || p.id) === itemId);
+            const itemCategory = (item.category || fullProduct?.category || '').toLowerCase().trim();
+            const itemCategoryWords = itemCategory.split(/\s+/).filter(w => w.length > 2);
+            
+            // Looking for cheaper alternatives
+            const alternatives = productsToUse.filter(p => {
+                const pCategory = (p.category || '').toLowerCase().trim();
+                const pPrice = Number(p.price);
+                const pId = (p._id || p.id);
+
+                if (pId === itemId) return false;
+                if (pPrice >= itemPrice) return false;
+                if (cart.some(cartItem => (cartItem._id || cartItem.id) === pId)) return false;
+
+                const isExactMatch = pCategory === itemCategory;
+                const isFuzzyMatch = itemCategory.includes(pCategory) || pCategory.includes(itemCategory);
+                const sharesWords = itemCategoryWords.some(word => pCategory.includes(word));
+                
+                const isGlobalRescue = isOverBudget && pPrice < (itemPrice * 0.5);
+
+                return isExactMatch || isFuzzyMatch || sharesWords || isGlobalRescue;
+            }).sort((a, b) => {
+                if (isOverBudget) {
+                    const diffA = Math.abs((itemPrice - a.price) - overBudgetAmount);
+                    const diffB = Math.abs((itemPrice - b.price) - overBudgetAmount);
+                    if (diffA !== diffB) return diffA - diffB;
+                }
+                return a.price - b.price;
+            });
+
+            const topAlternatives = alternatives.slice(0, 4);
+
+            for (let alt of topAlternatives) {
+                const isAlreadySuggested = newSuggestions.some(s => (s.suggestedProduct._id || s.suggestedProduct.id) === (alt._id || alt.id));
+                
+                if (!isAlreadySuggested) {
+                  const savings = (itemPrice - alt.price) * (item.quantity || 1);
+                  const solvesBudget = isOverBudget && (savings >= overBudgetAmount || savings > (overBudgetAmount * 0.6));
+                  
+                  newSuggestions.push({
+                      type: 'swap',
+                      originalProduct: item,
+                      suggestedProduct: alt,
+                      priceDifference: savings,
+                      solvesBudget: solvesBudget,
+                      reason: solvesBudget 
+                        ? `Best Match! This change will fix your budget.`
+                        : `Cheaper Item! This ${alt.category} can save you ${settings?.currency?.symbol || 'Rs'}. ${savings}.`,
+                      priority: solvesBudget ? 0 : 1
+                  });
+                }
+            }
+          }
+
+          // Suggestion to reduce quantity
+          for (let item of sortedCart) {
+            if (item.quantity > 1) {
+                let reduceBy = 1;
+                if (isOverBudget && item.price * item.quantity > overBudgetAmount) {
+                    reduceBy = Math.min(item.quantity - 1, Math.ceil(overBudgetAmount / item.price));
+                }
+                const savings = item.price * reduceBy;
+                newSuggestions.push({
+                    type: 'quantity',
+                    originalProduct: item,
+                    suggestedProduct: item, 
+                    newQuantity: item.quantity - reduceBy,
+                    priceDifference: savings,
+                    reason: `Reduce quantity by ${reduceBy} to save ${settings?.currency?.symbol || 'Rs'}. ${savings}.`,
+                    priority: 2
+                });
+            }
+          }
+          
+          newSuggestions.sort((a, b) => {
+            if (a.priority !== b.priority) return a.priority - b.priority;
+            return b.priceDifference - a.priceDifference;
+          });
+          
+          setSuggestions(newSuggestions.slice(0, 10));
+          setLoadingSuggestions(false);
+        }, 500);
+        return () => clearTimeout(timer);
+      } else {
+        setSuggestions([]);
+        setLoadingSuggestions(false);
+      }
+    };
+
+    generateLocalSuggestions();
+  }, [cart, totalAmount, income, products, allProducts, overBudgetAmount, isOverBudget]);
+
+  // Function to apply smart action
+  const handleSmartAction = (suggestion) => {
+    if (suggestion.type === 'quantity') {
+      updateQuantity(suggestion.originalProduct._id || suggestion.originalProduct.id, suggestion.newQuantity);
+      toast.success(`Quantity updated! You saved ${settings?.currency?.symbol || 'Rs'} ${suggestion.priceDifference}.`, {
+        icon: '📉',
+        style: { borderRadius: '10px', background: '#111', color: '#fff' }
+      });
+    } else if (suggestion.type === 'remove') {
+      removeFromCart(suggestion.originalProduct._id || suggestion.originalProduct.id);
+      toast.success(`Item removed! You saved ${settings?.currency?.symbol || 'Rs'} ${suggestion.priceDifference}.`, {
+        icon: '🗑️',
+        style: { borderRadius: '10px', background: '#111', color: '#fff' }
+      });
+    } else {
+      swapCartItem(suggestion.originalProduct._id || suggestion.originalProduct.id, suggestion.suggestedProduct, suggestion.originalProduct.quantity || 1);
+      toast.success(`Swap successful! You saved ${settings?.currency?.symbol || 'Rs'} ${suggestion.priceDifference}.`, {
+          icon: '✨',
+          style: { borderRadius: '10px', background: '#111', color: '#fff' }
+      });
+    }
+  };
+
+  if (loading) return <div className="loading-state">Loading cart...</div>;
 
   return (
-    <div style={{ padding: isMobile ? '40px 5%' : '60px 10%', backgroundColor: '#fff', minHeight: '85vh' }}>
-      <h1 style={{ fontSize: isMobile ? '24px' : '32px', fontWeight: '400', marginBottom: '40px', borderBottom: '1px solid #eee', paddingBottom: '20px' }}>
+    <div className="cart-container">
+      <h1 className="cart-title">
         YOUR CART
       </h1>
 
       {cart.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '100px' }}>
-          <h2 style={{ color: '#aaa', fontWeight: '300' }}>Cart is empty!</h2>
+        <div className="empty-cart">
+          <h2 className="empty-cart-title">Cart is empty!</h2>
           <button 
             onClick={() => navigate('/all-products')} 
-            style={{ marginTop: '20px', padding: '15px 40px', borderRadius: '50px', border: '1px solid #111', background: 'none', cursor: 'pointer' }}
+            className="start-shopping-btn"
           >
-            GO SHOPPING
+            START SHOPPING
           </button>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {cart.map((item, index) => (
-            <div key={index} style={{
-              ...cartItemRow,
-              flexDirection: isMobile ? 'column' : 'row',
-              alignItems: isMobile ? 'flex-start' : 'center',
-              gap: isMobile ? '15px' : '20px',
-              border: isOverBudget ? '1px solid #ffcccc' : '1px solid #f0f0f0' // Over budget par item border halka red
-            }}>
-              
-              {/* Product Info (Image + Name) */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '20px', width: isMobile ? '100%' : 'auto' }}>
-                <img src={item.image} alt={item.name} style={productImg} />
-                <div style={{ flex: 1 }}>
-                  <h3 style={{ fontSize: '16px', fontWeight: '600', margin: '0' }}>{item.name}</h3>
-                  <p style={{ color: '#ff5a5a', fontWeight: '700', marginTop: '5px' }}>Rs {item.price}</p>
-                </div>
-              </div>
-              
-              {/* Quantity controls & Price Section */}
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center', 
-                width: isMobile ? '100%' : 'auto',
-                gap: isMobile ? '0' : '40px'
-              }}>
-                <div style={qtyControls}>
-                  <button onClick={() => updateQuantity(item._id, item.quantity - 1)} style={qtyBtn}><Minus size={14}/></button>
-                  <span style={{ fontWeight: '700' }}>{item.quantity}</span>
-                  <button onClick={() => updateQuantity(item._id, item.quantity + 1)} style={qtyBtn}><Plus size={14}/></button>
-                </div>
-
-                <div style={{ textAlign: 'right' }}>
-                  <p style={{ fontSize: '18px', fontWeight: '700', margin: 0 }}>Rs {(item.price * item.quantity).toFixed(2)}</p>
-                  <button 
-                    onClick={() => removeFromCart(item._id)} 
-                    style={removeBtn}
-                  >
-                    <Trash2 size={16} style={{marginRight: '5px'}}/> {isMobile ? '' : 'Remove'}
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-
-          {/* Cart Summary Section */}
-          <div style={{
-            ...summaryContainer,
-            minWidth: isMobile ? '100%' : '350px',
-            boxSizing: 'border-box'
-          }}>
-            
-            {/* SMART UX: Warning & Suggestion Box */}
+        <div className="cart-content">
+          
+          {/* Cart Items and Budget Information */}
+          <div className="cart-items-section">
+            {/* Alert for exceeding budget */}
             {isOverBudget && (
-              <div style={{ backgroundColor: '#fff3cd', padding: '15px', borderRadius: '12px', borderLeft: '5px solid #ffc107', marginBottom: '20px' }}>
-                <h4 style={{ margin: '0 0 5px 0', color: '#856404', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                  <AlertTriangle size={18} /> Budget Alert!
-                </h4>
-                <p style={{ color: '#856404', margin: '0', fontSize: '14px' }}>
-                  Aapka budget Rs. {userBudget} tha. Aap limit se <strong>Rs. {overBudgetAmount.toFixed(2)}</strong> aagay nikal gaye hain.
-                </p>
-                <p style={{ color: '#856404', margin: '10px 0 0 0', fontSize: '13px', fontWeight: '600' }}>
-                  💡 Suggestion: Please kisi item ki quantity kam karein ya item remove karein.
+              <div className="ai-warning-banner">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div className="pulse-icon">
+                    <AlertTriangle size={24} color="#fff" />
+                  </div>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>Budget Alert!</h3>
+                    <p style={{ margin: '2px 0 0 0', fontSize: '14px', opacity: 0.9 }}>
+                      You are exceeding your budget by <strong>{settings?.currency?.symbol || 'Rs'} {overBudgetAmount.toFixed(2)}</strong>.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="cart-items-list" style={{ marginTop: isOverBudget ? '20px' : '0' }}>
+              {cart.map((item, index) => (
+                <div key={index} className={`cart-item-row ${isOverBudget ? 'over-budget' : ''}`}>
+                  {/* Product Details (Image + Info) */}
+                  <div className="product-item-group">
+                    <div className="product-img-container" style={{ backgroundColor: item.bgColor || '#f8fafc' }}>
+                      <img 
+                        src={item.image} 
+                        alt={item.name} 
+                        className="product-img"
+                      />
+                    </div>
+                    <div className="product-text-info">
+                      <h3 className="product-name">{item.name}</h3>
+                      <p className="product-price-small">{settings?.currency?.symbol || 'Rs'} {item.price}</p>
+                    </div>
+                  </div>
+                  
+                  {/* Actions (Qty + Remove) */}
+                  <div className="cart-item-actions">
+                    <div className="qty-controls">
+                      <button onClick={() => updateQuantity(item._id || item.id, item.quantity - 1)} className="qty-btn"><Minus size={14}/></button>
+                      <span style={{ fontWeight: '700' }}>{item.quantity}</span>
+                      <button onClick={() => updateQuantity(item._id || item.id, item.quantity + 1)} className="qty-btn"><Plus size={14}/></button>
+                    </div>
+
+                    <div className="item-total-section">
+                      <p className="item-total-price">{settings?.currency?.symbol || 'Rs'} {(item.price * item.quantity).toFixed(2)}</p>
+                      <button onClick={() => removeFromCart(item._id || item.id)} className="remove-btn">
+                        <Trash2 size={14} style={{marginRight: '5px'}}/> {isMobile ? '' : 'Remove'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* BUDGET RESCUE - Savings suggestions */}
+            {suggestions.length > 0 && (
+              <div className={`suggestion-section ${isOverBudget ? 'over-budget' : ''}`} style={{ display: isOverBudget ? 'block' : 'none' }}>
+                <div className="suggestion-header">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div className="sparkle-icon" style={{ background: isOverBudget ? '#ef4444' : '#111' }}>
+                      <Sparkles size={20} color="#fff" />
+                    </div>
+                    <div>
+                      <h3 style={{ margin: 0, fontSize: '20px', fontWeight: '800', color: '#111' }}>
+                        Savings Swaps
+                      </h3>
+                      <p style={{ margin: 0, fontSize: '12px', color: '#ef4444', fontWeight: '600' }}>Suggestions to get back in budget!</p>
+                    </div>
+                  </div>
+                </div>
+
+                {!loadingSuggestions ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    {suggestions.map((s, idx) => (
+                      <div key={idx} className={`alt-card ${s.solvesBudget ? 'best-match' : ''}`}>
+                        {s.solvesBudget && (
+                          <div className="best-for-budget-badge">
+                            BEST FOR BUDGET
+                          </div>
+                        )}
+                        <div className="suggestion-type-label">
+                          <span>{s.type === 'remove' ? 'Remove item:' : s.type === 'quantity' ? 'Reduce quantity:' : 'Replace expensive item:'} <strong>{s.originalProduct?.name}</strong></span>
+                        </div>
+                        
+                        <div className="suggestion-item">
+                          <div className="suggestion-info-side">
+                            <img 
+                              src={Array.isArray(s.suggestedProduct?.image) ? s.suggestedProduct.image[0] : (s.suggestedProduct?.image || 'https://via.placeholder.com/60')} 
+                              alt="" 
+                              className="suggestion-img"
+                            />
+                            <div className="suggestion-text">
+                              <div className="suggestion-name">{s.suggestedProduct?.name}</div>
+                              <p className="suggestion-reason">{s.reason}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="suggestion-action-side">
+                            <div className="suggestion-price">{settings?.currency?.symbol || 'Rs'} {s.suggestedProduct?.price}</div>
+                            <button 
+                              onClick={() => handleSmartAction(s)}
+                              className={`swap-btn ${s.solvesBudget ? 'solves-budget' : ''}`}
+                            >
+                              {s.type === 'swap' ? 'Swap Now' : 'Update Now'}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+                    <Loader2 size={30} className="animate-spin" style={{ margin: '0 auto 15px' }} />
+                    <p>Finding suggestions...</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Right Side: Summary (Expense details) */}
+          <div className="summary-container">
+            <h3 style={{ margin: '0 0 20px 0', fontSize: '20px', fontWeight: '700' }}>Order Summary</h3>
+            
+            {isOverBudget && (
+              <div className="budget-warning-box">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ef4444', marginBottom: '8px' }}>
+                  <AlertTriangle size={18} />
+                  <span style={{ fontWeight: '700', fontSize: '14px' }}>Over Budget!</span>
+                </div>
+                <p style={{ margin: 0, fontSize: '13px', color: '#666', lineHeight: '1.5' }}>
+                  Your total is <strong>{settings?.currency?.symbol || 'Rs'}. {overBudgetAmount.toFixed(2)}</strong> over your budget.
                 </p>
               </div>
             )}
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '25px' }}>
-              <h3 style={{ margin: 0 }}>Total Amount</h3>
-              <h3 style={{ margin: 0, color: isOverBudget ? '#ef4444' : '#111' }}>Rs {totalAmount.toFixed(2)}</h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
+              <span style={{ color: '#666' }}>Items Total</span>
+              <span style={{ fontWeight: '600' }}>{settings?.currency?.symbol || 'Rs'} {totalAmount.toFixed(2)}</span>
             </div>
-            
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
+              <span style={{ color: '#666' }}>Delivery Fee</span>
+              <span style={{ fontWeight: '600' }}>{settings?.currency?.symbol || 'Rs'} {shippingFee.toFixed(2)}</span>
+            </div>
+            <div style={{ borderTop: '1px solid #eee', marginTop: '20px', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', marginBottom: '30px' }}>
+              <span style={{ fontWeight: '700', fontSize: '18px' }}>GRAND TOTAL</span>
+              <span style={{ fontWeight: '800', fontSize: '20px' }}>{settings?.currency?.symbol || 'Rs'} {finalTotal.toFixed(2)}</span>
+            </div>
+
             <button 
-              onClick={() => navigate('/checkout')} 
-              style={{...checkoutBtn, backgroundColor: isOverBudget ? '#ef4444' : '#111'}}
+              onClick={() => navigate('/checkout')}
+              className="checkout-btn"
+              style={{
+                backgroundColor: isOverBudget ? '#ef4444' : '#111',
+              }}
             >
-              {isOverBudget ? 'CONTINUE ANYWAY' : 'PROCEED TO CHECKOUT'}
+              PLACE ORDER <ArrowRight size={18} />
             </button>
+            
+            <p style={{ textAlign: 'center', fontSize: '12px', color: '#aaa', marginTop: '15px' }}>
+              Tax and delivery fees will be finalized at checkout.
+            </p>
           </div>
         </div>
       )}
     </div>
   );
 };
-
-// --- Styles (Same as yours) ---
-const cartItemRow = { display: 'flex', justifyContent: 'space-between', padding: '20px', borderRadius: '20px', backgroundColor: '#fff' };
-const productImg = { width: '80px', height: '80px', objectFit: 'cover', backgroundColor: '#f9f9f9', borderRadius: '12px' };
-const qtyControls = { display: 'flex', alignItems: 'center', gap: '12px', border: '1px solid #eee', borderRadius: '50px', padding: '6px 15px', backgroundColor: '#fafafa' };
-const qtyBtn = { background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '5px' };
-const removeBtn = { color: '#ff4d4d', border: 'none', background: 'none', cursor: 'pointer', fontSize: '12px', marginTop: '8px', display: 'flex', alignItems: 'center', float: 'right' };
-const summaryContainer = { marginTop: '40px', padding: '30px', backgroundColor: '#f9f9f9', borderRadius: '25px', alignSelf: 'flex-end' };
-const checkoutBtn = { width: '100%', color: '#fff', padding: '18px', borderRadius: '50px', border: 'none', fontWeight: '700', cursor: 'pointer', fontSize: '16px', transition: '0.3s' };
 
 export default Cart;

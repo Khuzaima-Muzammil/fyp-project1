@@ -1,11 +1,16 @@
+// Importing React and necessary components
 import React, { useContext, useState, useEffect } from 'react';
 import { ShopContext } from '../../context/ShopContext';
 import { Package, ShoppingCart, Users, TrendingUp, PlusCircle, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import '../../styles/Dashboard.css';
 
 const Dashboard = () => {
+  // Extracting products from global context
   const { products } = useContext(ShopContext);
+  
+  // State for dashboard statistics
   const [apiStats, setApiStats] = useState({
     products: products?.length || 0,
     orders: 0,
@@ -13,20 +18,33 @@ const Dashboard = () => {
     revenue: 0
   });
 
+  // --- RESPONSIVE LOGIC ---
+  const [width, setWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  const isMobile = width < 768;
+  const isTablet = width >= 768 && width < 1024;
+
+  // --- DATA FETCHING (Fetching dashboard data from the backend) ---
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         const token = localStorage.getItem('token');
         const config = { headers: { 'Authorization': `Bearer ${token}`, 'x-auth-token': token } };
 
+        // Sending all three requests simultaneously
         const [ordersRes, productsRes, usersRes] = await Promise.allSettled([
-          axios.get('http://localhost:5000/api/orders', config),
-          axios.get('http://localhost:5000/api/products'), 
-          axios.get('http://localhost:5000/api/users', config) 
+          axios.get('http://localhost:5004/api/orders', config), // Orders data
+          axios.get('http://localhost:5004/api/products'),       // Products data
+          axios.get('http://localhost:5004/api/users', config)   // Users data
         ]);
 
         let totalOrders = 0, totalRevenue = 0, totalProducts = products?.length || 0, totalUsers = 0;
 
+        // Checking the results
         if (ordersRes.status === 'fulfilled') {
           totalOrders = ordersRes.value.data.length;
           totalRevenue = ordersRes.value.data.reduce((total, order) => total + (order.totalPrice || order.totalAmount || 0), 0);
@@ -36,58 +54,51 @@ const Dashboard = () => {
 
         setApiStats({ orders: totalOrders, products: totalProducts, users: totalUsers, revenue: totalRevenue.toFixed(2) });
       } catch (error) {
-        console.error("Error:", error);
+        console.error("Dashboard data error:", error);
       }
     };
     fetchDashboardData();
   }, [products]);
 
+  // List of statistics cards
   const stats = [
-    { id: 1, title: 'Products', value: apiStats.products, icon: <Package size={20} />, color: '#3b82f6' },
-    { id: 2, title: 'Orders', value: apiStats.orders, icon: <ShoppingCart size={20} />, color: '#10b981' },
-    { id: 3, title: 'Users', value: apiStats.users, icon: <Users size={20} />, color: '#f59e0b' },
-    { id: 4, title: 'Revenue', value: `Rs ${apiStats.revenue}`, icon: <TrendingUp size={20} />, color: '#8b5cf6' },
+    { id: 1, title: 'Total Products', value: apiStats.products, icon: <Package size={20} />, color: '#3b82f6' },
+    { id: 2, title: 'Total Orders', value: apiStats.orders, icon: <ShoppingCart size={20} />, color: '#10b981' },
+    { id: 3, title: 'Total Users', value: apiStats.users, icon: <Users size={20} />, color: '#f59e0b' },
+    { id: 4, title: 'Total Revenue', value: `Rs ${apiStats.revenue}`, icon: <TrendingUp size={20} />, color: '#8b5cf6' },
   ];
 
   return (
-    <div>
+    <div className="dashboard-container">
       {/* Stats Grid */}
-      <div style={statsGridStyle}>
+      <div className="stats-grid">
         {stats.map((item) => (
-          <div key={item.id} style={statCardStyle}>
-            <div style={{ ...iconBoxStyle, backgroundColor: item.color + '15', color: item.color }}>
+          <div key={item.id} className="stat-card">
+            <div className="icon-box" style={{ backgroundColor: item.color + '15', color: item.color }}>
               {item.icon}
             </div>
             <div>
-              <p style={{ margin: 0, color: '#666', fontSize: '12px' }}>{item.title}</p>
-              <h3 style={{ margin: 0, fontSize: '20px', fontWeight: '800' }}>{item.value}</h3>
+              <p style={{ margin: 0, color: '#666', fontSize: isMobile ? '10px' : '12px' }}>{item.title}</p>
+              <h3 style={{ margin: 0, fontSize: isMobile ? '16px' : '20px', fontWeight: '800' }}>{item.value}</h3>
             </div>
           </div>
         ))}
       </div>
 
       {/* Quick Actions */}
-      <div style={tableContainerStyle}>
-        <h3 style={{ marginBottom: '20px', fontSize: '16px' }}>Quick Actions</h3>
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-          <Link to="/admin/manage-products" style={actionButtonStyle}>
+      <div className="actions-container">
+        <h3 style={{ marginBottom: '20px', fontSize: isMobile ? '14px' : '16px', fontWeight: '700' }}>Quick Actions</h3>
+        <div style={{ display: 'flex', gap: '10px', flexDirection: isMobile ? 'column' : 'row' }}>
+          <Link to="/admin/manage-products" className="action-btn">
             <PlusCircle size={18} /> Add Product
           </Link>
-          <Link to="/admin/manage-orders" style={secondaryActionButton}>
-            <Eye size={18} /> Orders
+          <Link to="/admin/manage-orders" className="secondary-action-btn">
+            <Eye size={18} /> View Orders
           </Link>
         </div>
       </div>
     </div>
   );
 };
-
-// Styles
-const statsGridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '15px', marginBottom: '30px' };
-const statCardStyle = { backgroundColor: '#fff', padding: '15px', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '12px', border: '1px solid #f1f5f9' };
-const iconBoxStyle = { width: '40px', height: '40px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
-const tableContainerStyle = { backgroundColor: '#fff', padding: '20px', borderRadius: '20px', border: '1px solid #f1f5f9' };
-const actionButtonStyle = { backgroundColor: '#3b82f6', color: '#fff', padding: '10px 20px', borderRadius: '10px', textDecoration: 'none', fontWeight: '600', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' };
-const secondaryActionButton = { ...actionButtonStyle, backgroundColor: '#f1f5f9', color: '#475569' };
 
 export default Dashboard;

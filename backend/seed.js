@@ -4,59 +4,107 @@ require('dotenv').config();
 
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/lumiere')
   .then(() => console.log("✅ MongoDB Connected..."))
-  .catch(err => console.log("❌ Connection Error:", err));
+  .catch(err => console.log("Connection Error:", err));
 
-const productsData = [
-  // CAPS (6)
-  { name: "Classic Navy Cap", price: 61, category: "Caps", image: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=400", bgColor: "#d1d5db" },
-  { name: "Urban Red Hat", price: 35, category: "Caps", image: "https://images.unsplash.com/photo-1521369909029-2afed882baee?w=400", bgColor: "#eac0b3" },
-  { name: "Desert Sand Cap", price: 45, category: "Caps", image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400", bgColor: "#f3f4f6" },
-  { name: "Vintage Trucker", price: 50, category: "Caps", image: "https://images.unsplash.com/photo-1556306535-0f09a537f0a3?w=400", bgColor: "#d1d5db" },
-  { name: "Black Stealth Cap", price: 55, category: "Caps", image: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=400", bgColor: "#e5e7eb" },
-  { name: "Sport White Cap", price: 30, category: "Caps", image: "https://images.unsplash.com/photo-1533055640609-24b498dfd74c?w=400", bgColor: "#f3f4f6" },
-
-  // HOODIES (6)
-  { name: "Essential Red Hoodie", price: 75, category: "Hoodies", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400", bgColor: "#DE8C73" },
-  { name: "Midnight Black Hoodie", price: 90, category: "Hoodies", image: "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=400", bgColor: "#d1d5db" },
-  { name: "Grey Melange Hoodie", price: 85, category: "Hoodies", image: "https://images.unsplash.com/photo-1564557287817-3785e3c77f53?w=400", bgColor: "#e5e7eb" },
-  { name: "Ocean Blue Fleece", price: 80, category: "Hoodies", image: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=400", bgColor: "#f3f4f6" },
-  { name: "Pastel Pink Hoodie", price: 70, category: "Hoodies", image: "https://images.unsplash.com/photo-1620799139507-2a76f79a2f4d?w=400", bgColor: "#eac0b3" },
-  { name: "Olive Cargo Hoodie", price: 88, category: "Hoodies", image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400", bgColor: "#d1d5db" },
-
-  // SHIRTS (6)
-  { name: "Pure White Tee", price: 25, category: "Shirts", image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=400", bgColor: "#f3f4f6" },
-  { name: "Navy Striped Shirt", price: 45, category: "Shirts", image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400", bgColor: "#d1d5db" },
-  { name: "Charcoal V-Neck", price: 28, category: "Shirts", image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=400", bgColor: "#e5e7eb" },
-  { name: "Denim Blue Shirt", price: 55, category: "Shirts", image: "https://images.unsplash.com/photo-1541101767792-f9b2b1c4f127?w=400", bgColor: "#d1d5db" },
-  { name: "Summer Linen Shirt", price: 48, category: "Shirts", image: "https://images.unsplash.com/photo-1598033129183-c4f50c7176c8?w=400", bgColor: "#f3f4f6" },
-  { name: "Black Formal Shirt", price: 50, category: "Shirts", image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400", bgColor: "#d1d5db" },
-
-  // JACKETS (6)
-  { name: "Leather Biker Jacket", price: 150, category: "Jackets", image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400", bgColor: "#d1d5db" },
-  { name: "Winter Puffer Jacket", price: 120, category: "Jackets", image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400", bgColor: "#f3f4f6" },
-  { name: "Yellow Windbreaker", price: 85, category: "Jackets", image: "https://images.unsplash.com/photo-1544923246-77307dd654ca?w=400", bgColor: "#DE8C73" },
-  { name: "Denim Trucker Jacket", price: 95, category: "Jackets", image: "https://images.unsplash.com/photo-1576871333021-d62157d62058?w=400", bgColor: "#eac0b3" },
-  { name: "Classic Bomber", price: 110, category: "Jackets", image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400", bgColor: "#e5e7eb" },
-  { name: "Parka Long Coat", price: 180, category: "Jackets", image: "https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=400", bgColor: "#d1d5db" },
-
-  // SNEAKERS (6)
-  { name: "Air White Sneakers", price: 130, category: "Sneakers", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400", bgColor: "#f3f4f6" },
-  { name: "Runner Sport Shoes", price: 95, category: "Sneakers", image: "https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=400", bgColor: "#d1d5db" },
-  { name: "Classic Converse Style", price: 65, category: "Sneakers", image: "https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=400", bgColor: "#e5e7eb" },
-  { name: "Black Pro Runners", price: 110, category: "Sneakers", image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400", bgColor: "#d1d5db" },
-  { name: "Retro High Tops", price: 140, category: "Sneakers", image: "https://images.unsplash.com/photo-1512374382149-4332c6c02153?w=400", bgColor: "#f3f4f6" },
-  { name: "Casual Grey Loafers", price: 75, category: "Sneakers", image: "https://images.unsplash.com/photo-1539185441755-769473a23570?w=400", bgColor: "#eac0b3" }
+const categories = [
+  "Caps", "T-Shirts", "Shirts", "Trousers", "Jeans", 
+  "Shorts", "Sweaters", "Jackets", "Hoodies", "Coats"
 ];
+
+const categoryImages = {
+  "Caps": ["https://images.unsplash.com/photo-1556306535-0f09a536f0ae?q=80&w=400", "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=400"],
+  "T-Shirts": ["https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=400", "https://images.unsplash.com/photo-1581655353564-df123a1eb820?q=80&w=400"],
+  "Shirts": ["https://images.unsplash.com/photo-1596755094514-f87e32f6b717?q=80&w=400", "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=400"],
+  "Trousers": ["https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=400", "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?q=80&w=400"],
+  "Jeans": ["https://images.unsplash.com/photo-1542272604-787c3835535d?q=80&w=400", "https://images.unsplash.com/photo-1604176354204-9268737828e4?q=80&w=400"],
+  "Shorts": ["https://images.unsplash.com/photo-1591195853828-11db59a44f6b?q=80&w=400", "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?q=80&w=400"],
+  "Sweaters": ["https://images.unsplash.com/photo-1620799140188-3b2a02fd9a77?q=80&w=400", "https://images.unsplash.com/photo-1614838634125-992383c0f4f9?q=80&w=400"],
+  "Jackets": ["https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=400", "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=400"],
+  "Hoodies": ["https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=400", "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80&w=400"],
+  "Coats": ["https://images.unsplash.com/photo-1539533113208-f6df8cc8b543?q=80&w=400", "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=400"]
+};
+
+const styles = [
+  "Casual", "Vintage", "Modern", "Urban", "Classic", 
+  "Streetwear", "Minimalist", "Premium", "Sport", "Formal"
+];
+
+const colors = [
+  "Black", "White", "Navy", "Olive", "Grey", 
+  "Maroon", "Beige", "Denim", "Charcoal", "Khaki"
+];
+
+// Helper to generate 30 days of price history
+const generatePriceHistory = (basePrice) => {
+  const history = [];
+  const today = new Date();
+  for (let i = 30; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    
+    const fluctuation = basePrice * (Math.random() * 0.15 - 0.075);
+    const historicalPrice = Math.max(10, Math.round(basePrice + fluctuation));
+    
+    history.push({
+      price: historicalPrice,
+      date: date
+    });
+  }
+  return history;
+};
+
+const productsData = [];
+let idCounter = 1;
+
+categories.forEach((cat) => {
+  for (let i = 0; i < 10; i++) {
+    const style = styles[Math.floor(Math.random() * styles.length)];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    
+    const productName = `${color} ${style} ${cat.slice(0, cat.endsWith('s') ? -1 : undefined)}`;
+    
+    // Clothing prices usually between 500 and 15000 PKR
+    let minPrice = 800, maxPrice = 3000;
+    if (cat === "Coats" || cat === "Jackets") { minPrice = 3000; maxPrice = 12000; }
+    else if (cat === "Jeans" || cat === "Sweaters" || cat === "Hoodies") { minPrice = 1500; maxPrice = 5000; }
+    else if (cat === "Caps" || cat === "Socks") { minPrice = 300; maxPrice = 1200; }
+    
+    let currentPrice = Math.floor(Math.random() * (maxPrice - minPrice + 1) + minPrice);
+    
+    if (i === 0) currentPrice = minPrice;
+    if (i === 9) currentPrice = maxPrice;
+
+    // Pick a safe, human-free image from our curated list
+    const imagesForCat = categoryImages[cat] || categoryImages["Shirts"];
+    const image = imagesForCat[i % imagesForCat.length];
+
+    const priceHistory = generatePriceHistory(currentPrice);
+
+    productsData.push({
+      name: productName + ` - Vol ${idCounter}`, 
+      price: currentPrice,
+      category: cat,
+      image: image,
+      bgColor: `#f3f4f6`,
+      stock: Math.floor(Math.random() * 100) + 10,
+      description: `Premium quality ${productName.toLowerCase()} designed for maximum comfort and style. A perfect addition to your wardrobe.`,
+      priceHistory: priceHistory,
+      rating: (Math.random() * 1.5 + 3.5).toFixed(1) // 3.5 to 5.0
+    });
+    idCounter++;
+  }
+});
 
 const seedDB = async () => {
   try {
+    console.log("Clearing existing products...");
     await Product.deleteMany({});
-    console.log("🗑️ Old data cleared.");
+    console.log(`Inserting ${productsData.length} clothing products...`);
     await Product.insertMany(productsData);
-    console.log("🚀 30 Products (5 Categories) added successfully!");
+    console.log("✅ Database Seeded Successfully with 100 human-free clothing products!");
     mongoose.connection.close();
   } catch (error) {
-    console.error("❌ Error:", error.message);
+    console.error("Error:", error.message);
     mongoose.connection.close();
   }
 };

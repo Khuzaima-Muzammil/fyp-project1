@@ -1,0 +1,184 @@
+.register-container {
+    max-width: 400px;
+    margin: 80px auto;
+    padding: 30px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.error-box {
+    background-color: #fce4e4;
+    color: #cc0000;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb;
+    margin-bottom: 20px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.register-form h2 {
+    font-weight: 600;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.register-form p {
+    text-align: center;
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box; /* Padding handling */
+}
+
+.input-group input:focus {
+    border-color: #000;
+    outline: none;
+}
+
+.signup-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+.signup-btn:hover {
+    background-color: #333;
+}
+
+.login-link-container {
+    margin-top: 25px;
+    font-size: 14px;
+}
+
+.login-link {
+    color: #10b981;
+    font-weight: 800;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.login-link:hover {
+    opacity: 0.8;
+}
+
+/* Input container styling */
+.input-group {
+    margin-bottom: 20px;
+    position: relative;
+    text-align: left;
+}
+
+/* Jab error ho to input ka border aur text color */
+.input-error {
+    border: 2px solid #ff4d4d !important; /* Sharp Red Border */
+    background-color: #fff0f0 !important; /* Light Red Background */
+    color: #333 !important;
+}
+
+/* ERROR MESSAGE TEXT (Exactly below input) */
+.field-error-msg {
+    color: #d93025 !important; /* Dark Red color for visibility */
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    margin-top: 6px !important;
+    display: block !important;
+    background: transparent !important; /* Taake background white na dikhe */
+}
+
+/* Server Error Box (Top level) */
+.error-box {
+    background-color: #fce4e4 !important;
+    color: #cc0000 !important;
+    padding: 12px !important;
+    border-radius: 8px !important;
+    border: 1px solid #f5c6cb !important;
+    margin-bottom: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+/* Container focus */
+.register-container {
+    background: #ffffff;
+    border: 1px solid #eee;
+}
+
+/* Red Error Border for Inputs */
+.input-error {
+    border: 2px solid #ff4d4d !important;
+    background-color: #fff9f9 !important;
+    outline: none;
+}
+
+/* Error Message Text - SHARP RED */
+.field-error-msg {
+    color: #e63946 !important; /* Proper Red */
+    font-size: 12px !important;
+    margin-top: 5px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    font-weight: 500 !important;
+    text-align: left;
+}
+
+/* Icon Color inside error */
+.field-error-msg svg {
+    color: #e63946 !important;
+}
+
+/* Success State (Optional) */
+.input-success:focus {
+    border: 1px solid #2ecc71;
+}
+/* Sharp Red Borders for invalid inputs */
+.input-error {
+    border: 2px solid #ff0000 !important;
+    background-color: #fff5f5 !important;
+    outline: none !important;
+}
+
+/* Error Text - Pure Red, Visible below the field */
+.field-error-msg {
+    color: #ff0000 !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    margin-top: 5px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    text-transform: none !important;
+}
+
+/* SVG icon color inside error message */
+.field-error-msg svg {
+    color: #ff0000 !important;
+}
+
+/* Success behavior for other inputs */
+.input-group input:focus:not(.input-error) {
+    border-color: #000;
+}

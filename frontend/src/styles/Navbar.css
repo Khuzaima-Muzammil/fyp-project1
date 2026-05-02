@@ -1,0 +1,332 @@
+/* Navbar.css */
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff;
+  padding: 22px 6%; /* Increased padding for a larger navbar */
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+}
+
+.navbar-logo {
+  text-decoration: none !important;
+  border: none !important;
+  outline: none !important;
+}
+
+.navbar-logo h1 {
+  font-weight: 800;
+  font-size: 28px; /* Increased from 24px */
+  letter-spacing: -1px;
+  color: #000;
+  margin: 0;
+  text-decoration: none !important;
+  border-bottom: none !important;
+}
+
+.search-bar-container {
+  display: flex;
+  align-items: center;
+  background-color: #F1F5F9;
+  border-radius: 50px;
+  padding: 6px 20px; /* Increased padding */
+  width: 25%;
+  height: 38px; /* Increased from 32px */
+  transition: all 0.3s ease;
+}
+
+.nav-right-section {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Tighter gap for single line */
+}
+
+.nav-profile-group {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.profile-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logout-btn {
+  color: #EF4444; /* Logout icon red */
+  background-color: #fff; /* Match navbar background */
+  display: flex;
+  align-items: center;
+  padding: 6px;
+  border-radius: 50%;
+  transition: all 0.2s;
+  border: 1px solid #F3F4F6;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background-color: #FEF2F2; /* Very light red on hover */
+  transform: scale(1.05);
+}
+
+.search-bar-container:focus-within {
+  background-color: #fff;
+  border-color: #4F46E5;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+.search-input {
+  border: none;
+  background: none;
+  outline: none;
+  margin-left: 10px;
+  width: 100%;
+  font-size: 13px; /* Slightly smaller text */
+  color: #111;
+}
+
+.nav-link-item {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111;
+  text-decoration: none !important; /* No lines */
+  transition: opacity 0.2s;
+}
+
+.nav-link-item:hover {
+  opacity: 0.7;
+}
+
+.cart-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #EAB308; /* Optimizer matching color */
+  color: #fff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
+}
+
+.avatar-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  cursor: pointer;
+}
+
+.login-btn-styled {
+  background-color: #000; /* Pure black background */
+  color: #fff !important; /* White text */
+  padding: 6px 18px; /* Reduced padding for smaller size */
+  border-radius: 50px; /* Fully rounded */
+  font-weight: 700;
+  font-size: 13px; /* Slightly smaller font to match other links */
+  text-decoration: none !important; /* No underline */
+  display: inline-block;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  border: none;
+  cursor: pointer;
+}
+
+.login-btn-styled:hover {
+  background-color: #333;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  color: #fff !important;
+}
+
+/* --- Mobile Menu Styles --- */
+.hamburger-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #111;
+  padding: 5px;
+}
+
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.mobile-menu-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-menu-content {
+  position: fixed;
+  top: 0;
+  left: -280px; /* Hidden by default */
+  width: 280px;
+  height: 100%;
+  background-color: #fff;
+  z-index: 2001;
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  padding: 30px 20px;
+}
+
+.mobile-menu-content.open {
+  left: 0;
+}
+
+.mobile-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 20px;
+}
+
+.mobile-menu-header h2 {
+  font-weight: 800;
+  font-size: 22px;
+  margin: 0;
+  letter-spacing: -1px;
+}
+
+.mobile-menu-header button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.mobile-menu-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mobile-nav-link {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  text-decoration: none;
+  padding: 12px 15px;
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+
+.mobile-nav-link:hover {
+  background-color: #f8fafc;
+  color: #111;
+}
+
+.mobile-logout-btn {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  background-color: #fef2f2;
+  color: #ef4444;
+  border: none;
+  padding: 12px 15px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  text-align: left;
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  .navbar-container {
+    padding: 15px 4%;
+  }
+
+  .search-bar-container {
+    width: 35%;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-container {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px 5%;
+  }
+
+  .navbar-logo h1 {
+    font-size: 20px;
+  }
+
+  .search-bar-container {
+    width: 100%;
+    order: 3; /* Push to bottom on mobile */
+  }
+
+  .nav-right-section {
+    width: 100%;
+    justify-content: space-between;
+    order: 2;
+  }
+
+  .nav-link-item {
+    font-size: 13px;
+  }
+
+  .avatar-circle {
+    width: 32px;
+    height: 32px;
+    font-size: 11px;
+  }
+
+  .login-btn-styled {
+    padding: 5px 15px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-link-item {
+    display: none; /* Hide textual links on very small screens to save space */
+  }
+  
+  .nav-link-item.logo-text {
+    display: block; /* Keep logo */
+  }
+}

@@ -1,373 +1,59 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-/* --- GLOBAL RESPONSIVE FIXES --- */
+:root {
+  --primary-color: #111827;
+  --accent-color: #4F46E5;
+  --bg-color: #F8FAFC;
+  --card-bg: #FFFFFF;
+  --text-main: #1F2937;
+  --text-muted: #6B7280;
+  --border-color: #E2E8F0;
+  --radius-lg: 20px;
+  --radius-md: 12px;
+  --shadow-soft: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+}
+
 * {
   margin: 0;
   padding: 0;
-  box-sizing: border-box; /* Width calculation sahi karta hai */
+  box-sizing: border-box; 
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 body, html {
-  overflow-x: hidden; /* Side scroll ko sakhti se rok deta hai */
+  overflow-x: hidden;
   width: 100%;
-  margin: 0;
-  padding: 0;
-  background-color: #F4F6F8;
-  color: #111827;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  line-height: 1.6;
 }
 
-img {
-  max-width: 100%; /* Image kabhi bhi container se bari nahi hogi */
-  height: auto;
-  display: block;
+button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-a { text-decoration: none; }
-button { cursor: pointer; border: none; outline: none; }
-
-/* --- App Layout --- */
-.app-layout {
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
-}
-
-/* Mobile par layout ko adjust karne ke liye */
-@media (max-width: 768px) {
-  .app-layout {
-    flex-direction: column;
-    height: auto;
-    overflow: visible;
-  }
-}
-
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-}
-
-.page-wrapper {
-  padding: 20px 40px;
-  max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-@media (max-width: 768px) {
-  .page-wrapper {
-    padding: 15px;
-  }
-}
-
-/* --- Sidebar --- */
-.sidebar {
-  width: 260px;
-  background-color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 24px 20px;
-  border-right: 1px solid #e5e7eb;
-}
-
-/* Mobile par sidebar hide ya different style (Optional) */
-@media (max-width: 768px) {
-  .sidebar {
-    display: none; /* Mobile par aksar sidebar drawer ban jata hai */
-  }
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 20px;
-  font-weight: 800;
-  color: #1a1a1a;
-  margin-bottom: 40px;
-}
-
-.brand-icon {
-  background-color: #1C2333;
+.btn-aesthetic {
+  background-color: var(--primary-color);
   color: white;
-  padding: 6px;
-  border-radius: 8px;
-  display: flex;
-}
-
-.nav-links {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  color: #6b7280;
-  font-weight: 600;
-  border-radius: 12px;
-  transition: 0.2s;
-}
-
-.nav-item:hover { background-color: #f3f4f6; color: #111827; }
-.nav-item.active { background-color: #1C2333; color: white; }
-
-/* Install App Box */
-.install-box {
-  background: #f8faff;
-  border: 1px solid #e0e7ff;
-  padding: 20px;
-  border-radius: 16px;
-  text-align: center;
-}
-.install-icon {
-  background: white; width: 40px; height: 40px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 10px; color: #4f46e5; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-.install-box h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
-.install-box p { font-size: 12px; color: #6b7280; margin-bottom: 12px; }
-.btn-dark { background: #1C2333; color: white; padding: 10px 16px; border-radius: 20px; font-weight: 600; font-size: 13px; width: 100%; transition: 0.3s; }
-.btn-dark:hover { background: #000; }
-
-/* --- Navbar --- */
-.navbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 40px;
-  position: sticky;
-  top: 0;
-  background-color: #F4F6F8;
-  z-index: 10;
-}
-
-@media (max-width: 768px) {
-  .navbar {
-    padding: 15px;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-}
-
-.search-bar {
-  display: flex;
-  align-items: center;
-  background: white;
-  padding: 10px 20px;
-  border-radius: 30px;
-  width: 400px;
-  border: 1px solid #e5e7eb;
-}
-
-@media (max-width: 768px) {
-  .search-bar {
-    width: 100%;
-    order: 3; /* Search mobile par niche aa jayegi */
-  }
-}
-
-.search-bar input { border: none; outline: none; width: 100%; margin-left: 10px; font-size: 14px; }
-
-.nav-actions { display: flex; align-items: center; gap: 20px; }
-.nav-actions .links { font-weight: 600; color: #4b5563; }
-.login-btn { background: #1C2333; color: white; padding: 8px 24px; border-radius: 20px; font-weight: 600; }
-
-/* --- Home Layout (Banners) --- */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 40px;
-}
-
-@media (max-width: 1024px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr; /* Tablet/Mobile par column */
-  }
-}
-
-.banner-card {
-  border-radius: 24px;
-  padding: 30px;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.banner-white { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-.banner-orange { background: #E28873; color: white; }
-
-.banner-title { font-size: 24px; font-weight: 800; }
-.banner-price { font-size: 32px; font-weight: 800; margin-top: 5px; }
-.banner-sub { color: #6b7280; font-size: 14px; }
-
-/* --- Product Cards --- */
-.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.section-header h2 { font-size: 20px; font-weight: 800; }
-.view-all { font-size: 14px; font-weight: 600; color: #111827; background: white; padding: 6px 16px; border-radius: 20px; }
-
-.products-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px;
-}
-
-@media (max-width: 768px) {
-  .products-grid {
-    grid-template-columns: repeat(2, 1fr); /* Mobile par 2 products ek line mein */
-    gap: 12px;
-  }
-}
-
-.product-card {
-  background: white;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-}
-.product-img-box {
-  height: 220px;
-  display: flex; justify-content: center; align-items: center;
-  position: relative;
-  padding: 20px;
-}
-
-@media (max-width: 768px) {
-  .product-img-box {
-    height: 150px;
-    padding: 10px;
-  }
-}
-
-.product-img-box img { max-height: 100%; mix-blend-mode: multiply; }
-.rating-badge {
-  position: absolute; top: 15px; right: 15px; background: white; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-.rating-badge .star { color: #FBBF24; }
-
-.product-info { padding: 16px; }
-.product-info h3 { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
-.buy-btn { background: #1C2333; color: white; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
-
-/* ============================
-   Auth Pages (Login / Register)
-============================ */
-.auth-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: calc(100vh - 120px);
-  padding: 20px;
-}
-
-.auth-card {
-  background: white;
-  padding: 40px;
-  border-radius: 24px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-  width: 100%;
-  max-width: 450px;
-}
-
-@media (max-width: 480px) {
-  .auth-card {
-    padding: 25px;
-  }
-}
-
-.auth-title {
-  font-size: 28px;
-  font-weight: 800;
-  margin-bottom: 8px;
-  text-align: center;
-  color: #111827;
-}
-
-.auth-subtitle {
-  color: #6b7280;
-  font-size: 14px;
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #374151;
-}
-
-.form-control {
-  width: 100%;
-  padding: 12px 16px;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  font-size: 14px;
-  outline: none;
-  transition: all 0.3s ease;
-  background-color: #f9fafb;
-}
-
-.form-control:focus {
-  border-color: #1C2333;
-  background-color: white;
-  box-shadow: 0 0 0 3px rgba(28, 35, 51, 0.1);
-}
-
-.auth-btn {
-  width: 100%;
-  background: #1C2333;
-  color: white;
-  padding: 14px;
-  border-radius: 12px;
+  padding: 12px 28px;
+  border-radius: 50px;
   font-weight: 700;
-  font-size: 15px;
-  margin-top: 10px;
-  transition: 0.3s;
-  cursor: pointer;
   border: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
 }
 
-.auth-btn:hover { background: #000; }
-
-.auth-links {
-  margin-top: 24px;
-  text-align: center;
-  font-size: 14px;
-  color: #6b7280;
+.btn-aesthetic:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  background-color: #000;
 }
 
-.auth-links a { color: #1C2333; font-weight: 800; text-decoration: none; }
-.auth-links a:hover { text-decoration: underline; }
+/* Global Animations */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
 
-.cart-icon-container { position: relative; display: inline-block; }
-
-.cart-badge {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background-color: #ef4444;
-  color: white;
-  font-size: 11px;
-  font-weight: bold;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid white;
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }

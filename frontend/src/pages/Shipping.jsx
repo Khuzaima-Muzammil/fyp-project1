@@ -1,15 +1,37 @@
-import React from 'react';
+// Importing React and necessary hooks
+import React, { useState, useEffect } from 'react';
 
 const Shipping = () => {
+  // --- RESPONSIVE LOGIC (Mobile check) ---
+  const [width, setWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  const isMobile = width < 768;
+
   return (
-    <div style={styles.container}>
-      <h1 style={styles.heading}>Shipping Policy</h1>
-      <h3 style={styles.subHeading}>Delivery Time</h3>
-      <p style={styles.text}>Normal orders 3 se 5 working days mein deliver ho jate hain.</p>
-      <h3 style={styles.subHeading}>Shipping Charges</h3>
-      <p style={styles.text}>Rs. 2500 se upar ke orders par shipping bilkul FREE hai. Us se kam par Rs. 200 standard charges apply honge.</p>
-      <h3 style={styles.subHeading}>Returns</h3>
-      <p style={styles.text}>Agar product mein koi masla ho toh aap 7 din ke andar return ya exchange karwa sakte hain.</p>
+    <div style={{
+      ...styles.container,
+      margin: isMobile ? '20px auto' : '40px auto',
+      padding: isMobile ? '20px' : '30px',
+      width: isMobile ? '90%' : '800px'
+    }}>
+      {/* Main page heading */}
+      <h1 style={{...styles.heading, fontSize: isMobile ? '24px' : '28px'}}>Shipping Policy</h1>
+      
+      {/* Delivery Time details */}
+      <h3 style={{...styles.subHeading, fontSize: isMobile ? '18px' : '20px'}}>Delivery Time</h3>
+      <p style={styles.text}>2-3 days in major cities, while remote areas take 5-7 working days.</p>
+      
+      {/* Shipping Charges details */}
+      <h3 style={{...styles.subHeading, fontSize: isMobile ? '18px' : '20px'}}>Shipping Charges</h3>
+      <p style={styles.text}>Delivery fee across Pakistan is Rs. 250. Delivery is absolutely free for orders above Rs. 5000.</p>
+      
+      {/* Return/Exchange details */}
+      <h3 style={{...styles.subHeading, fontSize: isMobile ? '18px' : '20px'}}>Returns Policy</h3>
+      <p style={styles.text}>You can return or exchange the product within 7 days if it is in its original packaging.</p>
     </div>
   );
 };

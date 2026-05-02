@@ -1,0 +1,113 @@
+/* Settings.css */
+
+.settings-container {
+  padding: 20px;
+}
+
+.loading-state {
+  padding: 40px;
+  text-align: center;
+}
+
+.settings-title {
+  font-weight: 800;
+  font-size: 28px;
+  margin-bottom: 30px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+.card-style {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 25px;
+  border: 1px solid #edf2f7;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #1a202c;
+}
+
+.input-group {
+  margin-bottom: 15px;
+}
+
+.label-style {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #4a5568;
+  margin-bottom: 8px;
+}
+
+.input-style {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  outline: none;
+  font-size: 15px;
+}
+
+.save-actions {
+  margin-top: 30px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.save-btn {
+  background-color: #111;
+  color: #fff;
+  border: none;
+  padding: 15px 40px;
+  border-radius: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: 0.3s;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .settings-container {
+    padding: 15px;
+  }
+
+  .settings-title {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
+  .grid-container {
+    grid-template-columns: 1fr;
+  }
+
+  .card-style {
+    padding: 20px;
+  }
+
+  .save-actions {
+    margin-top: 20px;
+    justify-content: stretch;
+  }
+
+  .save-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

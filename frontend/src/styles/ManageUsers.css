@@ -1,0 +1,187 @@
+/* ManageUsers.css */
+
+.users-container {
+  padding: 20px;
+}
+
+.loading-state {
+  padding: 40px;
+  text-align: center;
+}
+
+.users-title {
+  margin-bottom: 30px;
+  font-weight: 800;
+  font-size: 28px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+}
+
+.section-title {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+}
+
+.mobile-user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.mobile-user-card {
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid #edf2f7;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.role-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.role-admin {
+  background-color: #ebf4ff;
+  color: #3182ce;
+}
+
+.role-user {
+  background-color: #f0fff4;
+  color: #38a169;
+}
+
+.table-wrapper {
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+  overflow-x: auto; /* Added horizontal scroll */
+  border: 1px solid #edf2f7;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  min-width: 600px; /* Force minimum width for scroll on small screens */
+}
+
+.thead-row {
+  background-color: #f8fafc;
+  border-bottom: 2px solid #edf2f7;
+}
+
+.th-style {
+  padding: 15px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.tr-style {
+  border-bottom: 1px solid #edf2f7;
+  transition: 0.2s;
+}
+
+.tr-style:hover {
+  background-color: #f8fafc;
+}
+
+.td-style {
+  padding: 15px 20px;
+  font-size: 14px;
+  color: #334155;
+}
+
+.reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(minmax(300px, 1fr));
+    gap: 21px;
+    max-height: 420px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+/* Custom Scrollbar for Admin Reviews */
+.reviews-grid::-webkit-scrollbar {
+  width: 6px;
+}
+.reviews-grid::-webkit-scrollbar-track {
+  background: #f8fafc;
+  border-radius: 10px;
+}
+.reviews-grid::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+.reviews-grid::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.review-card {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid #edf2f7;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+.avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background-color: #3182ce;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.review-comment {
+  color: #555;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .users-container {
+    padding: 10px;
+  }
+
+  .users-title {
+    font-size: 22px;
+  }
+
+  .section-title {
+    font-size: 16px;
+  }
+
+  .grid-container {
+    gap: 30px;
+  }
+
+  .reviews-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .review-comment {
+    font-size: 13px;
+  }
+
+  .th-style, .td-style {
+    padding: 12px 15px;
+  }
+}

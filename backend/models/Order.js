@@ -1,18 +1,21 @@
 const mongoose = require('mongoose');
 
+// Order schema (Database structure)
 const orderSchema = new mongoose.Schema({
-  // --- Aapke Purane Fields (Waisay hi hain) ---
+  // ID of the user placing the order
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
+  // Items included in the order
   orderItems: [
     {
       name: { type: String, required: true },
       quantity: { type: Number, required: true },
       image: { type: String, required: true },
       price: { type: Number, required: true },
+      category: { type: String },
       product: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Product',
@@ -20,51 +23,54 @@ const orderSchema = new mongoose.Schema({
       }
     }
   ],
+  // Shipping address
   shippingAddress: { 
     type: String, 
     required: true 
   },
+  // Customer's phone number
   phone: {
     type: String,
     required: true
   },
+  // Total price
   totalPrice: { 
     type: Number, 
     required: true, 
     default: 0.0 
   },
+  // Delivery charges
+  deliveryCost: {
+    type: Number,
+    default: 0
+  },
+  // Payment method
   paymentMethod: {
     type: String,
     default: 'Cash on Delivery'
   },
+  // Current status of the order
   status: {
     type: String,
-    default: 'Pending' // Ye dono schemas mein same tha
+    default: 'Pending' 
   },
+  // Payment status (Has the payment been made?)
+  isPaid: {
+    type: Boolean,
+    required: true,
+    default: false
+  },
+  paidAt: {
+    type: Date
+  },
+  // Has the order been delivered?
   isDelivered: { 
     type: Boolean, 
     required: true, 
     default: false 
-  },
-
-  // --- Naye Extra Fields Jo Aapne Add Karwaye ---
-  userId: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User' 
-  },
-  products: [
-    {
-      productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
-      name: String,
-      quantity: { type: Number, default: 1 },
-      price: Number
-    }
-  ],
-  totalAmount: { 
-    type: Number 
   }
-  }, {
-    timestamps: true // Product kab add hua
-  });
+}, {
+  timestamps: true // Tracks when the order was created and updated
+});
 
 module.exports = mongoose.model('Order', orderSchema);
